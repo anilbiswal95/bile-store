@@ -1,0 +1,70 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: bike-store
+
+  datasource:
+    url: jdbc:h2:mem:bikestore;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    open-in-view: false
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        default_batch_fetch_size: 20
+        order_inserts: true
+        order_updates: true
+      jdbc:
+        batch_size: 20
+
+  flyway:
+    enabled: false
+
+  sql:
+    init:
+      mode: always
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+
+  thymeleaf:
+    cache: true
+    prefix: classpath:/templates/
+    suffix: .html
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:dGhpcypBcyBhIHZlcnkgbG9uZyBzZWNyZXQga2V5IGZvciBiaWtlIHN0b3JlIGp3dCBhdXRoZW50aWNhdGlvbg==}
+    expiration-ms: 86400000
+
+  admin:
+    email: admin@bikestore.com
+    password: Admin@123
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+    endpoint:
+      health:
+        show-details: when-authorized
+
+logging:
+  level:
+    com.bike.store: INFO
+    org.hibernate.SQL: WARN

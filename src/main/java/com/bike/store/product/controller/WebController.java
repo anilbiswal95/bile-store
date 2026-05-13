@@ -1,0 +1,99 @@
+package com.bike.store.product.controller;
+
+import com.bike.store.common.dto.PagedResponse;
+import com.bike.store.order.dto.OrderDto;
+import com.bike.store.product.dto.ProductDto;
+import com.bike.store.product.service.ProductService;
+import com.bike.store.order.service.OrderService;
+import com.bike.store.user.entity.User;
+import com.bike.store.user.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.security.Principal;
+import java.util.List;
+
+@Controller
+@RequiredArgsConstructor
+public class WebController {
+
+    private final ProductService productService;
+    private final UserService userService;
+    private final OrderService orderService;
+
+    @GetMapping("/")
+    public String home(Model model) {
+        model.addAttribute("featured", productService.getFeaturedProducts());
+        model.addAttribute("categories", productService.getAllCategories());
+        return "home";
+    }
+
+    @GetMapping("/products")
+    public String products(@RequestParam(required = false) Long categoryId,
+                           @RequestParam(required = false) BigDecimal minPrice,
+                           @RequestParam(required = false) BigDecimal maxPrice,
+                           @RequestParam(required = false) String bikeModel,
+                           @RequestParam(defaultValue = "0") int page,
+                           Model model) {
+        PagedResponse<ProductDto> products = productService.getProducts(categoryId, minPrice, maxPrice, bikeModel, page, 12);
+        model.addAttribute("products", products);
+        model.addAttribute("categories", productService.getAllCategories());
+        model.addAttribute("bikeModels", productService.getBikeModels());
+        model.addAttribute("selectedCategory", categoryId);
+        model.addAttribute("selectedBikeModel", bikeModel);
+        return "products";
+    }
+
+    @GetMapping("/products/{id}")
+    public String productDetail(@PathVariable long id, Model model) {
+        model.addAttribute("product", productService.getProduct(id));
+        return "product-detail";
+    }
+
+    @GetMapping("/search")
+    public String search(@RequestParam String q,
+                         @RequestParam(defaultValue = "0") int page,
+                         Model model) {
+        model.addAttribute("products", productService.searchProducts(q, page, 12));
+        model.addAttribute("query", q);
+        return "search";
+    }
+
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
+
+    @GetMapping("/register")
+    public String registerPage() {
+        return "register";
+    }
+
+    @GetMapping("/cart")
+    public String cartPage() {
+        return "cart";
+    }
+
+    @GetMapping("/orders")
+    public String ordersPage(@RequestParam(defaultValue = "0") int page,
+                             @RequestParam(defaultValue = "10") int size,
+                             Model model,
+                             Principal principal) {
+        List<OrderDto> orders = orderService.getUserOrders(principal.getName(), page, size);
+        model.addAttribute("orders", orders);
+        return "orders";
+    }
+
+    /*@GetMapping("/orders")
+    public String ordersPage() {
+        return "orders";
+    }*/
+
+    @GetMapping("/admin")
+    public String adminPage() {
+        return "admin/dashboard";
+    }
+}
