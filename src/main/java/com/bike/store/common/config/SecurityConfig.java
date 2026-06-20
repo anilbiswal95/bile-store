@@ -42,7 +42,10 @@ public class SecurityConfig {
                 .and()
                 .formLogin()
                 .loginPage("/login")                 // your Thymeleaf login page
-                .loginProcessingUrl("/api/auth/login") // handled by your AuthController
+                //.loginProcessingUrl("/api/auth/login") // handled by your AuthController
+                .loginProcessingUrl("/login")    // use default form processing URL
+                .usernameParameter("username")   // matches your form input name
+                .passwordParameter("password")
                 .defaultSuccessUrl("/", true)
                 .permitAll()
                 .and()
