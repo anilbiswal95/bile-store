@@ -1,6 +1,9 @@
 package com.bike.store.product.controller;
 
+import com.bike.store.cart.dto.CartDto;
+import com.bike.store.cart.service.CartService;
 import com.bike.store.common.dto.PagedResponse;
+import com.bike.store.common.exception.ResourceNotFoundException;
 import com.bike.store.order.dto.OrderDto;
 import com.bike.store.product.dto.ProductDto;
 import com.bike.store.product.service.ProductService;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -23,6 +27,7 @@ public class WebController {
     private final ProductService productService;
     private final UserService userService;
     private final OrderService orderService;
+    private final CartService cartService;
 
     @GetMapping("/")
     public String home(Model model) {
@@ -47,10 +52,22 @@ public class WebController {
         return "products";
     }
 
-    @GetMapping("/products/{id}")
+    /*@GetMapping("/products/{id}")
     public String productDetail(@PathVariable long id, Model model) {
         model.addAttribute("product", productService.getProduct(id));
         return "product-detail";
+    }*/
+
+    @GetMapping("/products/{id}")
+    public String productDetail(@PathVariable long id, Model model) {
+        try {
+            ProductDto product = productService.getProduct(id);
+            model.addAttribute("product", product);
+            return "product-detail";
+        } catch (ResourceNotFoundException ex) {
+            model.addAttribute("message", "Product not found");
+            return "not-found"; // create templates/not-found.html
+        }
     }
 
     @GetMapping("/search")
@@ -72,10 +89,35 @@ public class WebController {
         return "register";
     }
 
-    @GetMapping("/cart")
+    /*@GetMapping("/cart")
     public String cartPage() {
         return "cart";
+    }*/
+
+    @GetMapping("/cart")
+    public String cartPage(Model model, Principal principal) {
+        if (principal == null) {
+            model.addAttribute("message", "Please log in to view your cart");
+            return "login"; // or redirect to login
+        }
+
+        User user = userService.getByEmail(principal.getName())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        CartDto cart = cartService.getCartForUser(user.getId());
+        if (cart == null) {
+            cart = new CartDto(); // empty cart
+            cart.setItems(Collections.emptyList());
+            cart.setTotal(BigDecimal.ZERO);
+        }
+
+        model.addAttribute("cart", cart);
+        return "cart";
     }
+
+
+
+
 
     @GetMapping("/orders")
     public String ordersPage(@RequestParam(defaultValue = "0") int page,

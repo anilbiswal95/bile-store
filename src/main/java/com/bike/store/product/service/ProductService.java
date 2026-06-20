@@ -50,12 +50,20 @@ public class ProductService {
         return toPagedResponse(products);
     }
 
-    @Cacheable(value = "productDetail", key = "#id")
+    /*@Cacheable(value = "productDetail", key = "#id")
     public ProductDto getProduct(long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         return toDto(product);
+    }*/
+
+    @Cacheable(value = "productDetail", key = "#id")
+    public ProductDto getProduct(long id) {
+        Product product = productRepository.findByIdWithCategory(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        return toDto(product);
     }
+
 
     @Transactional
     @CacheEvict(value = {"products", "productDetail"}, allEntries = true)

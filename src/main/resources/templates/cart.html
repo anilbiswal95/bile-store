@@ -46,9 +46,22 @@
         <i class="bi bi-cart3"></i> Your Cart
     </h3>
 
-    <div id="cart-content">
+    <!--<div id="cart-content">
         <p class="text-muted">Loading...</p>
-    </div>
+    </div>-->
+    <table>
+        <tr>
+            <th>Product</th><th>Qty</th><th>Price</th><th>Subtotal</th>
+        </tr>
+        <tr th:each="item : ${cart.items}">
+            <td th:text="${item.productName}"></td>
+            <td th:text="${item.quantity}"></td>
+            <td th:text="${item.price}"></td>
+            <td th:text="${item.subtotal}"></td>
+        </tr>
+    </table>
+    <p>Total: <span th:text="${cart.total}"></span></p>
+
 
 </div>
 
