@@ -36,7 +36,7 @@ public class WebController {
         return "home";
     }
 
-    @GetMapping("/products")
+    /*@GetMapping("/products")
     public String products(@RequestParam(required = false) Long categoryId,
                            @RequestParam(required = false) BigDecimal minPrice,
                            @RequestParam(required = false) BigDecimal maxPrice,
@@ -50,7 +50,36 @@ public class WebController {
         model.addAttribute("selectedCategory", categoryId);
         model.addAttribute("selectedBikeModel", bikeModel);
         return "products";
+    }*/
+
+    @GetMapping("/products")
+    public String products(@RequestParam(required = false) Long categoryId,
+                           @RequestParam(required = false) String minPrice,
+                           @RequestParam(required = false) String maxPrice,
+                           @RequestParam(required = false) String bikeModel,
+                           @RequestParam(defaultValue = "0") int page,
+                           Model model) {
+
+        // Convert empty strings to null so repository sees "no filter"
+        BigDecimal min = (minPrice == null || minPrice.isBlank()) ? null : new BigDecimal(minPrice);
+        BigDecimal max = (maxPrice == null || maxPrice.isBlank()) ? null : new BigDecimal(maxPrice);
+        String modelFilter = (bikeModel == null || bikeModel.isBlank()) ? null : bikeModel;
+
+        // Optional: log the parsed filters for debugging
+        // log.debug("Products filter: categoryId={}, min={}, max={}, bikeModel={}, page={}",
+        //           categoryId, min, max, modelFilter, page);
+
+        PagedResponse<ProductDto> products = productService.getProducts(categoryId, min, max, modelFilter, page, 12);
+        model.addAttribute("products", products);
+        model.addAttribute("categories", productService.getAllCategories());
+        model.addAttribute("bikeModels", productService.getBikeModels());
+        model.addAttribute("selectedCategory", categoryId);
+        model.addAttribute("selectedBikeModel", modelFilter);
+        model.addAttribute("minPrice", min);
+        model.addAttribute("maxPrice", max);
+        return "products";
     }
+
 
     /*@GetMapping("/products/{id}")
     public String productDetail(@PathVariable long id, Model model) {

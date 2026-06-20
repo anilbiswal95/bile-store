@@ -128,6 +128,16 @@
                         <h3 class="text-center mb-4">Login to BikeStore</h3>
                         <div id="error" class="alert alert-danger d-none"></div>
 
+                        <!-- Display error message if login failed -->
+                        <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show">
+                            <strong>Login Failed!</strong>
+                            <p class="mb-0">Invalid email or password. Please check your credentials and try again.</p>
+                            <p class="mb-0 mt-2"><strong>💡 Admin Test Credentials:</strong></p>
+                            <p class="mb-0">Email: <code>admin@bikestore.com</code></p>
+                            <p class="mb-0">Password: <code>Admin@123</code></p>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+
                         <form id="loginForm" method="post" action="/api/auth/login">
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>

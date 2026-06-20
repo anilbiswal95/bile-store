@@ -4,6 +4,7 @@ import com.bike.store.cart.entity.Cart;
 import com.bike.store.cart.entity.CartItem;
 import com.bike.store.cart.repository.CartRepository;
 import com.bike.store.cart.service.CartService;
+import com.bike.store.common.email.EmailService;
 import com.bike.store.common.exception.AppException;
 import com.bike.store.common.exception.ResourceNotFoundException;
 import com.bike.store.order.dto.OrderDto;
@@ -25,7 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,6 +41,7 @@ public class OrderService {
     private final CartService cartService;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final EmailService emailService;
 
     @Transactional
     public OrderDto placeOrder(String email, PlaceOrderRequest request) {
@@ -88,6 +92,9 @@ public class OrderService {
         orderRepository.save(order);
         cartService.clearCart(email);
 
+        // Send order confirmation email
+        sendOrderConfirmationEmail(order, user);
+
         return toDto(order);
     }
 
@@ -117,6 +124,32 @@ public class OrderService {
 
     public Page<Order> getAllOrders(int page, int size) {
         return orderRepository.findAll(PageRequest.of(page, size));
+    }
+
+    /**
+     * Send order confirmation email to user
+     */
+    private void sendOrderConfirmationEmail(Order order, User user) {
+        try {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("customerName", user.getFullName());
+            variables.put("orderNumber", order.getOrderNumber());
+            variables.put("orderDate", order.getCreatedAt());
+            variables.put("shippingAddress", order.getShippingAddress());
+            variables.put("paymentMethod", order.getPaymentMethod());
+            variables.put("totalAmount", order.getTotalAmount());
+            variables.put("items", order.getItems());
+
+            emailService.sendHtmlEmail(
+                    user.getEmail(),
+                    "Order Confirmation - " + order.getOrderNumber(),
+                    "order-confirmation",
+                    variables
+            );
+        } catch (Exception e) {
+            // Log error but don't fail the order creation
+            System.err.println("Failed to send order confirmation email: " + e.getMessage());
+        }
     }
 
     private OrderDto toDto(Order order) {

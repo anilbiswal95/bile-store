@@ -3,7 +3,6 @@ package com.bike.store.common.config;
 import com.bike.store.user.security.JwtAuthFilter;
 import com.bike.store.user.security.JwtService;
 import com.bike.store.user.service.CustomUserDetailsService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,7 +12,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,43 +20,24 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
-    private final JwtService jwtService;
-
-    /*@Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers("/", "/products/**", "/search", "/api/auth/**",
-                        "/css/**", "/js/**", "/images/**", "/actuator/health").permitAll()
-                .antMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
-                .antMatchers("/api/cart/**", "/api/orders/**", "/cart/**",
-                        "/orders/**", "/profile/**").hasAnyRole("USER", "ADMIN")
-                .anyRequest().authenticated()
-                .and()
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }*/
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, 
+                                                   JwtAuthFilter jwtAuthFilter,
+                                                   AuthenticationProvider authenticationProvider) throws Exception {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                // ✅ Use antMatchers in Spring Security 5
                 // Allow public access to home, login, register, search, product pages, cart pages, and static resources
-                //.antMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
                 .antMatchers("/", "/home", "/login", "/register", "/search", "/products/**", "/cart/**",
-                        "/css/**", "/js/**", "/images/**").permitAll()
+                        "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                // Auth API (login/register/logout) is public
                 .antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/admin/**").hasRole("ADMIN")
+                // Admin UI and admin API require ROLE_ADMIN
+                .antMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
+                // Authenticated user endpoints
+                .antMatchers("/api/cart/**", "/api/orders/**").authenticated()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -70,18 +49,21 @@ public class SecurityConfig {
                 .logout()
                 .logoutUrl("/api/auth/logout")
                 .logoutSuccessUrl("/")
-                .permitAll();
+                .permitAll()
+                .and()
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
-    public JwtAuthFilter jwtAuthFilter() {
+    public JwtAuthFilter jwtAuthFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
         return new JwtAuthFilter(jwtService, userDetailsService);
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider(CustomUserDetailsService userDetailsService) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
@@ -98,3 +80,5 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 }
+
+

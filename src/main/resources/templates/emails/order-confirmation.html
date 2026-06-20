@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 0 0 5px 5px;
+        }
+        .order-details {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-left: 4px solid #3498db;
+        }
+        .order-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #2c3e50;
+        }
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .total {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+            padding: 15px;
+            background-color: #ecf0f1;
+        }
+        .footer {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Order Confirmation</h1>
+        </div>
+
+        <div class="content">
+            <p>Dear <strong th:text="${customerName}">Customer Name</strong>,</p>
+
+            <p>Thank you for your order! We're excited to process your purchase.</p>
+
+            <div class="order-details">
+                <div class="order-number">Order #<span th:text="${orderNumber}">ORD-12345678</span></div>
+                <p>
+                    <strong>Order Date:</strong> <span th:text="${#dates.format(orderDate, 'MMM dd, yyyy')}">Date</span><br>
+                    <strong>Total Amount:</strong> <span th:text="'$' + ${#numbers.formatDecimal(totalAmount, 1, 2)}">$0.00</span>
+                </p>
+            </div>
+
+            <h3>Order Items:</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${items}">
+                        <td th:text="${item.productName}">Product Name</td>
+                        <td th:text="${item.quantity}" style="text-align: center;">1</td>
+                        <td th:text="'$' + ${#numbers.formatDecimal(item.price, 1, 2)}">$0.00</td>
+                        <td th:text="'$' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}">$0.00</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="total">
+                Total: <span th:text="'$' + ${#numbers.formatDecimal(totalAmount, 1, 2)}">$0.00</span>
+            </div>
+
+            <h3>Shipping Information:</h3>
+            <p>
+                <strong>Shipping Address:</strong><br>
+                <span th:text="${shippingAddress}">Address</span>
+            </p>
+
+            <p>
+                <strong>Payment Method:</strong><br>
+                <span th:text="${paymentMethod}">Cash on Delivery</span>
+            </p>
+
+            <p>
+                We'll send you a tracking number once your order ships.
+            </p>
+
+            <div class="footer">
+                <p>If you have any questions about your order, please contact us at support@bikestore.com</p>
+                <p>&copy; 2024 Bike Store. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

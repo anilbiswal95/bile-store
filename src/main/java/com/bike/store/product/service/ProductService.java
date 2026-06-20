@@ -107,6 +107,14 @@ public class ProductService {
         return toDto(productRepository.save(product));
     }
 
+    @Transactional
+    @CacheEvict(value = {"products", "productDetail"}, allEntries = true)
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        productRepository.delete(product);
+    }
+
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
