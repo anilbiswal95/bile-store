@@ -5,146 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Confirmation</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        .header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-radius: 5px 5px 0 0;
-        }
-        .content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 0 0 5px 5px;
-        }
-        .order-details {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f5f5f5;
-            border-left: 4px solid #3498db;
-        }
-        .order-number {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th {
-            background-color: #3498db;
-            color: white;
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #2c3e50;
-        }
-        td {
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-        .total {
-            font-size: 18px;
-            font-weight: bold;
-            text-align: right;
-            padding: 15px;
-            background-color: #ecf0f1;
-        }
-        .footer {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-        }
-        .button {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
+        body { font-family: Arial, sans-serif; line-height:1.6; color:#333; }
+        .container { max-width:600px; margin:0 auto; padding:20px; background:#f9f9f9; }
+        .header { background:#111; color:#fff; padding:20px; text-align:center; border-radius:5px 5px 0 0; }
+        .brand-inline { display:flex; align-items:center; gap:12px; justify-content:center; margin-bottom:8px; }
+        .brand-inline img { height:40px; background:transparent; }
+        .brand-inline .brand-text { font-family: 'Poppins', sans-serif; font-weight:600; font-size:18px; color:#fff; }
+        .content { background:#fff; padding:30px; border-radius:0 0 5px 5px; }
+        .order-details { margin:20px 0; padding:15px; background:#f5f5f5; border-left:4px solid #3498db; }
+        .order-number { font-size:18px; font-weight:bold; color:#2c3e50; }
+        table { width:100%; border-collapse:collapse; margin:20px 0; }
+        th { background:#3498db; color:#fff; padding:10px; text-align:left; border:1px solid #2c3e50; }
+        td { padding:10px; border:1px solid #ddd; }
+        .total { font-size:18px; font-weight:bold; text-align:right; padding:15px; background:#ecf0f1; }
+        .footer { margin-top:20px; padding-top:20px; border-top:1px solid #ddd; font-size:12px; color:#666; text-align:center; }
+        .button { display:inline-block; margin-top:15px; padding:10px 20px; background:#3498db; color:#fff; text-decoration:none; border-radius:5px; }
+        @media (max-width:600px) { .container { padding:12px; } .brand-inline .brand-text { font-size:16px; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Order Confirmation</h1>
+<div class="container">
+    <div class="header">
+        <div class="brand-inline">
+            <img src="https://your-site.com/images/logo.jpg" alt="BOBBY RIDE CUSTOMS Logo">
+            <div class="brand-text">BOBBY RIDE CUSTOMS</div>
+        </div>
+        <h1 style="margin:0;font-size:20px;">Order Confirmation</h1>
+    </div>
+
+    <div class="content">
+        <p>Dear <strong th:text="${customerName}">Customer Name</strong>,</p>
+        <p>Thank you for your order! We're excited to process your purchase.</p>
+
+        <div class="order-details">
+            <div class="order-number">Order #<span th:text="${orderNumber}">ORD-12345678</span></div>
+            <p>
+                <strong>Order Date:</strong> <span th:text="${#dates.format(orderDate, 'MMM dd, yyyy')}">Date</span><br>
+                <strong>Total Amount:</strong> <span th:text="'₹' + ${#numbers.formatDecimal(totalAmount, 1, 2)}">₹0.00</span>
+            </p>
         </div>
 
-        <div class="content">
-            <p>Dear <strong th:text="${customerName}">Customer Name</strong>,</p>
+        <h3>Order Items:</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Product</th>
+                <th style="text-align:center">Quantity</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${items}">
+                <td th:text="${item.productName}">Product Name</td>
+                <td style="text-align:center" th:text="${item.quantity}">1</td>
+                <td th:text="'₹' + ${#numbers.formatDecimal(item.price, 1, 2)}">₹0.00</td>
+                <td th:text="'₹' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}">₹0.00</td>
+            </tr>
+            </tbody>
+        </table>
 
-            <p>Thank you for your order! We're excited to process your purchase.</p>
+        <div class="total">Total: <span th:text="'₹' + ${#numbers.formatDecimal(totalAmount, 1, 2)}">₹0.00</span></div>
 
-            <div class="order-details">
-                <div class="order-number">Order #<span th:text="${orderNumber}">ORD-12345678</span></div>
-                <p>
-                    <strong>Order Date:</strong> <span th:text="${#dates.format(orderDate, 'MMM dd, yyyy')}">Date</span><br>
-                    <strong>Total Amount:</strong> <span th:text="'$' + ${#numbers.formatDecimal(totalAmount, 1, 2)}">$0.00</span>
-                </p>
-            </div>
+        <h3>Shipping Information:</h3>
+        <p><strong>Shipping Address:</strong><br><span th:text="${shippingAddress}">Address</span></p>
 
-            <h3>Order Items:</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="item : ${items}">
-                        <td th:text="${item.productName}">Product Name</td>
-                        <td th:text="${item.quantity}" style="text-align: center;">1</td>
-                        <td th:text="'$' + ${#numbers.formatDecimal(item.price, 1, 2)}">$0.00</td>
-                        <td th:text="'$' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}">$0.00</td>
-                    </tr>
-                </tbody>
-            </table>
+        <p><strong>Payment Method:</strong><br><span th:text="${paymentMethod}">Cash on Delivery</span></p>
 
-            <div class="total">
-                Total: <span th:text="'$' + ${#numbers.formatDecimal(totalAmount, 1, 2)}">$0.00</span>
-            </div>
+        <p>We'll send you a tracking number once your order ships.</p>
 
-            <h3>Shipping Information:</h3>
-            <p>
-                <strong>Shipping Address:</strong><br>
-                <span th:text="${shippingAddress}">Address</span>
-            </p>
-
-            <p>
-                <strong>Payment Method:</strong><br>
-                <span th:text="${paymentMethod}">Cash on Delivery</span>
-            </p>
-
-            <p>
-                We'll send you a tracking number once your order ships.
-            </p>
-
-            <div class="footer">
-                <p>If you have any questions about your order, please contact us at support@bikestore.com</p>
-                <p>&copy; 2024 Bike Store. All rights reserved.</p>
-            </div>
+        <div class="footer">
+            <p>If you have any questions about your order, please contact us at support@bobbyridecustoms.com</p>
+            <p>© 2026 BOBBY RIDE CUSTOMS. All rights reserved.</p>
         </div>
     </div>
+</div>
 </body>
 </html>
-

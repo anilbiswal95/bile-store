@@ -1,103 +1,113 @@
-<!--
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - BikeStore</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-          background-color: #f8f9fa;
-        }
-        .card {
-          border-radius: 8px;
-        }
-        .btn-primary {
-          background-color: #e63946;
-          border-color: #e63946;
-        }
-        .btn-primary:hover {
-          background-color: #d62828;
-          border-color: #d62828;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-5">
-            <div class="card shadow-sm">
-                <div class="card-body p-4">
-                    <h3 class="text-center mb-4">Login</h3>
-                    &lt;!&ndash; Error message placeholder &ndash;&gt;
-                    <div id="error" class="alert alert-danger d-none"></div>
+    <title>Login - BOBBY RIDE CUSTOMS</title>
 
-                    &lt;!&ndash; Login form &ndash;&gt;
-                    <form id="loginForm" method="post" action="/api/auth/login">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" id="email" name="username" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" id="password" name="password" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Login</button>
-                    </form>
-
-                    &lt;!&ndash; Links &ndash;&gt;
-                    <p class="text-center mt-3">
-                        Don't have an account? <a href="/register">Register</a>
-                    </p>
-                    <a href="/" class="d-block text-center mt-2">Back to Home</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-&lt;!&ndash; Bootstrap JS &ndash;&gt;
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
--->
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - BikeStore</title>
+    <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Modern Font (same as home.html) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
     <style>
-        .btn-primary {
-          background-color: #e63946;
-          border-color: #e63946;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #222;
         }
-        .btn-primary:hover {
-          background-color: #d62828;
-          border-color: #d62828;
+
+        /* Navbar Styling (match home.html) */
+        .navbar {
+            font-family: 'Poppins', sans-serif;
         }
-        .form-control:focus {
-          border-color: #e63946;
-          box-shadow: 0 0 0 0.2rem rgba(230,57,70,0.25);
+
+        .navbar-brand img {
+            height: 48px;
+            margin-right: 12px;
+            background-color: transparent;
+            border-radius: 0;
         }
+
+        .navbar-brand span {
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: #f8f9fa;
+            letter-spacing: 0.5px;
+        }
+
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            font-size: 1.05rem;
+            color: #f8f9fa !important;
+            transition: color 0.25s ease, transform 0.25s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #e63946 !important; /* Accent red */
+            transform: translateY(-2px);
+        }
+
+        .navbar-search {
+            max-width: 640px;
+            width: 100%;
+        }
+
+        /* Login card and form */
         .login-section {
-          padding: 80px 0;
+            padding: 80px 0;
         }
+
         .card {
-          border-radius: 12px;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        .form-control:focus {
+            border-color: #e63946;
+            box-shadow: 0 0 0 0.2rem rgba(230,57,70,0.12);
+        }
+
+        .btn-primary {
+            background-color: #e63946;
+            border-color: #e63946;
+        }
+
+        .btn-primary:hover {
+            background-color: #d62828;
+            border-color: #d62828;
+        }
+
+        .helper-links a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .helper-links a:hover {
+            color: #e63946;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand img { height: 40px; }
+            .navbar-brand span { font-size: 1.05rem; }
         }
     </style>
 </head>
 <body>
 
-<!-- Navbar -->
+<!-- Navbar (same look as home.html) -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/"><i class="bi bi-bicycle"></i> BikeStore</a>
+        <!-- Logo + Brand (use logo.jpg as requested) -->
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img src="/images/logo.jpg" alt="BOBBY RIDE CUSTOMS Logo">
+            <span>BOBBY RIDE CUSTOMS</span>
+        </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -112,7 +122,24 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="/products">Products</a></li>
                 <li class="nav-item"><a class="nav-link" href="/cart"><i class="bi bi-cart3"></i> Cart</a></li>
-                <li class="nav-item"><a class="nav-link active" href="/login"><i class="bi bi-person"></i> Login</a></li>
+
+                <!-- Show Login if anonymous -->
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link active" href="/login"><i class="bi bi-person"></i> Login</a>
+                </li>
+
+                <!-- Show username + dropdown if authenticated -->
+                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i>
+                        <span sec:authentication="principal.fullName"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                        <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>
@@ -125,35 +152,35 @@
             <div class="col-md-6 col-lg-5">
                 <div class="card">
                     <div class="card-body p-4">
-                        <h3 class="text-center mb-4">Login to BikeStore</h3>
-                        <div id="error" class="alert alert-danger d-none"></div>
+                        <h3 class="text-center mb-4">Login to BOBBY RIDE CUSTOMS</h3>
 
-                        <!-- Display error message if login failed -->
+                        <!-- Error message (Thymeleaf) -->
                         <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show">
                             <strong>Login Failed!</strong>
                             <p class="mb-0">Invalid email or password. Please check your credentials and try again.</p>
-                            <p class="mb-0 mt-2"><strong>💡 Admin Test Credentials:</strong></p>
-                            <p class="mb-0">Email: <code>admin@bikestore.com</code></p>
-                            <p class="mb-0">Password: <code>Admin@123</code></p>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
 
-                        <form id="loginForm" method="post" action="/login"><!--<form id="loginForm" method="post" action="/api/auth/login">-->
+                        <!-- Login form -->
+                        <form id="loginForm" method="post" action="/login">
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
                                 <input type="email" id="email" name="username" class="form-control" placeholder="Enter your email" required>
                             </div>
+
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
                                 <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
                             </div>
+
                             <button type="submit" class="btn btn-primary w-100">Login</button>
                         </form>
 
                         <p class="text-center mt-3">
                             Don't have an account? <a href="/register">Register</a>
                         </p>
-                        <div class="text-center mt-2">
+
+                        <div class="text-center mt-2 helper-links">
                             <a href="/" class="text-decoration-none">← Back to Home</a>
                         </div>
                     </div>
@@ -163,10 +190,10 @@
     </div>
 </section>
 
-<!-- Footer -->
+<!-- Footer (match site) -->
 <footer class="bg-dark text-light py-4 mt-5">
     <div class="container text-center">
-        <p class="mb-0">© 2026 BikeStore. Premium Motorcycle Accessories.</p>
+        <p class="mb-0">© 2026 BOBBY RIDE CUSTOMS. Premium Motorcycle Accessories.</p>
     </div>
 </footer>
 

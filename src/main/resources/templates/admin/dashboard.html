@@ -4,13 +4,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - BikeStore</title>
+    <title>Admin Dashboard - BOBBY RIDE CUSTOMS</title>
+
+    <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Modern Font - Same as home.html -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
     <style>
         body {
+            font-family: 'Poppins', sans-serif;
             background-color: #f5f5f5;
         }
+
+        /* ===== NAVBAR - Same branding as home.html ===== */
+        .navbar {
+            font-family: 'Poppins', sans-serif;
+            background-color: #2c3e50 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0.5rem 0;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-brand img {
+            height: 48px;
+            background-color: transparent;
+            border-radius: 0;
+            object-fit: contain;
+        }
+
+        .navbar-brand span {
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: #f8f9fa;
+            letter-spacing: 0.5px;
+        }
+
+        .navbar .nav-link {
+            font-weight: 500;
+            font-size: 1.05rem;
+            color: #f8f9fa !important;
+            transition: color 0.25s ease, transform 0.25s ease;
+        }
+
+        .navbar .nav-link:hover {
+            color: #e63946 !important;
+            transform: translateY(-2px);
+        }
+
+        /* ===== SIDEBAR - Updated with brand colors ===== */
         .sidebar {
             background-color: #2c3e50;
             min-height: 100vh;
@@ -18,71 +67,174 @@
             position: sticky;
             top: 0;
         }
+
         .sidebar .nav-link {
-            color: white;
+            color: rgba(255,255,255,0.8);
             padding: 12px 20px;
             border-left: 4px solid transparent;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
+
         .sidebar .nav-link:hover,
         .sidebar .nav-link.active {
-            background-color: #34495e;
-            border-left-color: #3498db;
-            color: white;
+            background-color: rgba(255,255,255,0.08);
+            border-left-color: #e63946;
+            color: #ffffff;
         }
-        .navbar {
-            background-color: #34495e !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        .sidebar .nav-link i {
+            width: 24px;
+            text-align: center;
+            margin-right: 8px;
         }
+
+        /* ===== MAIN CONTENT ===== */
         .main-content {
             padding: 30px;
         }
+
         .card {
             border: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             margin-bottom: 20px;
         }
-        .btn-admin {
-            background-color: #3498db;
-            border: none;
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #e63946;
+            font-weight: 600;
         }
-        .btn-admin:hover {
-            background-color: #2980b9;
+
+        .btn-admin {
+            background-color: #e63946;
+            border-color: #e63946;
             color: white;
+            transition: all 0.25s ease;
+        }
+
+        .btn-admin:hover {
+            background-color: #c62835;
+            border-color: #c62835;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.35);
+        }
+
+        .btn-outline-secondary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-warning:hover,
+        .btn-danger:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ===== TAB STYLING ===== */
+        .nav-tabs .nav-link {
+            color: #2c3e50;
+            font-weight: 500;
+            border: none;
+            border-bottom: 3px solid transparent;
+            transition: all 0.25s ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-bottom-color: #e63946;
+            color: #e63946;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #e63946;
+            border-bottom-color: #e63946;
+            background-color: transparent;
+        }
+
+        /* ===== TABLE STYLING ===== */
+        .table thead {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(230, 57, 70, 0.05);
+        }
+
+        /* ===== RESPONSIVE TWEAKS ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+                position: relative;
+                margin-bottom: 20px;
+            }
+            .main-content {
+                padding: 15px;
+            }
+            .navbar-brand span {
+                font-size: 1rem;
+            }
+            .navbar-brand img {
+                height: 36px;
+            }
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="/"><i class="bi bi-bicycle"></i> BikeStore Admin</a>
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-                <span class="nav-link" sec:authentication="principal.username"></span>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="logout()">Logout</a>
-            </li>
-        </ul>
+
+<!-- ===== NAVBAR - Brand identity from home.html ===== -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand" href="/">
+            <img src="/images/logo.jpg" alt="BOBBY RIDE CUSTOMS Logo">
+            <span>BOBBY RIDE CUSTOMS</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="adminNavbar">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <span class="nav-link" sec:authentication="principal.fullName">
+                        <i class="bi bi-person-circle"></i> <span sec:authentication="principal.fullName"></span>
+                    </span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 
+<!-- ===== MAIN LAYOUT ===== -->
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
         <div class="col-md-2 sidebar">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link active" href="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                    <a class="nav-link active" href="/admin/dashboard">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/admin/products"><i class="bi bi-box-seam"></i> Products</a>
+                    <a class="nav-link" href="/admin/products">
+                        <i class="bi bi-box-seam"></i> Products
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/admin/categories"><i class="bi bi-tags"></i> Categories</a>
+                    <a class="nav-link" href="/admin/categories">
+                        <i class="bi bi-tags"></i> Categories
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/admin/orders"><i class="bi bi-receipt"></i> Orders</a>
+                    <a class="nav-link" href="/admin/orders">
+                        <i class="bi bi-receipt"></i> Orders
+                    </a>
                 </li>
             </ul>
         </div>
@@ -91,15 +243,22 @@
         <div class="col-md-10 main-content">
             <h3 class="mb-4"><i class="bi bi-speedometer2"></i> Admin Dashboard</h3>
 
+            <!-- Tabs -->
             <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="products-tab-btn" data-bs-toggle="tab" data-bs-target="#products-tab" type="button" role="tab">Products</button>
+                    <button class="nav-link active" id="products-tab-btn" data-bs-toggle="tab" data-bs-target="#products-tab" type="button" role="tab">
+                        <i class="bi bi-box-seam"></i> Products
+                    </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="categories-tab-btn" data-bs-toggle="tab" data-bs-target="#categories-tab" type="button" role="tab">Categories</button>
+                    <button class="nav-link" id="categories-tab-btn" data-bs-toggle="tab" data-bs-target="#categories-tab" type="button" role="tab">
+                        <i class="bi bi-tags"></i> Categories
+                    </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="orders-tab-btn" data-bs-toggle="tab" data-bs-target="#orders-tab" type="button" role="tab">Orders</button>
+                    <button class="nav-link" id="orders-tab-btn" data-bs-toggle="tab" data-bs-target="#orders-tab" type="button" role="tab">
+                        <i class="bi bi-receipt"></i> Orders
+                    </button>
                 </li>
             </ul>
 
@@ -107,8 +266,8 @@
                 <!-- Products Tab -->
                 <div class="tab-pane fade show active" id="products-tab" role="tabpanel">
                     <div class="card">
-                        <div class="card-header bg-light">
-                            <h5 class="card-title mb-0"><i class="bi bi-plus"></i> Add New Product</h5>
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="bi bi-plus-circle"></i> Add New Product</h5>
                         </div>
                         <div class="card-body">
                             <form id="productForm" class="row g-3 mb-4">
@@ -157,8 +316,8 @@
                     </div>
 
                     <div class="card mt-4">
-                        <div class="card-header bg-light">
-                            <h5 class="card-title mb-0"><i class="bi bi-list"></i> Products List</h5>
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="bi bi-list-ul"></i> Products List</h5>
                         </div>
                         <div class="card-body">
                             <div id="product-list" class="table-responsive"></div>
@@ -169,8 +328,8 @@
                 <!-- Categories Tab -->
                 <div class="tab-pane fade" id="categories-tab" role="tabpanel">
                     <div class="card">
-                        <div class="card-header bg-light">
-                            <h5 class="card-title mb-0"><i class="bi bi-plus"></i> Add New Category</h5>
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="bi bi-plus-circle"></i> Add New Category</h5>
                         </div>
                         <div class="card-body">
                             <form id="categoryForm" class="row g-3 mb-4">
@@ -195,8 +354,8 @@
                     </div>
 
                     <div class="card mt-4">
-                        <div class="card-header bg-light">
-                            <h5 class="card-title mb-0"><i class="bi bi-list"></i> Categories List</h5>
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="bi bi-list-ul"></i> Categories List</h5>
                         </div>
                         <div class="card-body">
                             <div id="category-list" class="table-responsive"></div>
@@ -206,12 +365,26 @@
 
                 <!-- Orders Tab -->
                 <div class="tab-pane fade" id="orders-tab" role="tabpanel">
-                    <div id="admin-orders"></div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="bi bi-list-ul"></i> Orders</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="admin-orders" class="text-center text-muted">Order management coming soon</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Footer -->
+<footer class="bg-dark text-light py-3 mt-4">
+    <div class="container text-center">
+        <p class="mb-0 small">© 2026 BOBBY RIDE CUSTOMS. Premium Motorcycle Accessories.</p>
+    </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -227,6 +400,8 @@
             .then(r => r.json())
             .then(data => {
                 const select = document.getElementById('pCatId');
+                // Clear existing options (except first)
+                select.innerHTML = '<option value="">Select Category</option>';
                 data.forEach(cat => {
                     const option = document.createElement('option');
                     option.value = cat.id;
@@ -315,15 +490,15 @@
                         <td>${p.stock || '0'}</td>
                         <td>${p.categoryName || ''}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" onclick="editProduct(${p.id})"><i class="bi bi-pencil"></i> Edit</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})"><i class="bi bi-trash"></i> Delete</button>
+                            <button class="btn btn-sm btn-warning" onclick="editProduct(${p.id})"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})"><i class="bi bi-trash"></i></button>
                         </td>
                     </tr>
                 `).join('');
 
                 const html = `
                     <table class="table table-sm table-hover">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
@@ -354,15 +529,15 @@
                         <td>${c.name || ''}</td>
                         <td>${c.description || ''}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" onclick="editCategory(${c.id})"><i class="bi bi-pencil"></i> Edit</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteCategory(${c.id})"><i class="bi bi-trash"></i> Delete</button>
+                            <button class="btn btn-sm btn-warning" onclick="editCategory(${c.id})"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCategory(${c.id})"><i class="bi bi-trash"></i></button>
                         </td>
                     </tr>
                 `).join('');
 
                 const html = `
                     <table class="table table-sm table-hover">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
