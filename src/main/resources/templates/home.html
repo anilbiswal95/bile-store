@@ -202,6 +202,13 @@
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="/profile">Profile</a></li>
                         <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        <!--<form th:action="@{/logout}" method="post" style="display:inline">
+                            <input th:if="${_csrf != null}"
+                                   type="hidden"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}" />
+                            <button type="submit" class="dropdown-item">Logout</button>
+                        </form>-->
                     </ul>
                 </li>
             </ul>

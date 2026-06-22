@@ -50,8 +50,10 @@ public class SecurityConfig {
                 .permitAll()
                 .and()
                 .logout()
-                .logoutUrl("/api/auth/logout")
-                .logoutSuccessUrl("/")
+                .logoutUrl("/logout")                // match templates
+                .logoutSuccessUrl("/")               // redirect after logout
+                .invalidateHttpSession(true)         // clear session
+                .deleteCookies("JSESSIONID", "token")          // clear cookie
                 .permitAll()
                 .and()
                 .authenticationProvider(authenticationProvider)

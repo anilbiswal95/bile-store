@@ -14,6 +14,8 @@ public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // CHANGED: Added @Access to ensure field access for ID
+    @Access(AccessType.PROPERTY)
     private Long id;
 
     @CreationTimestamp

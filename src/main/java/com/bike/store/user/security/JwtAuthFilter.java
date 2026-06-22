@@ -26,6 +26,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        // Skip JWT processing for logout and public endpoints
+        String path = request.getRequestURI();
+        if (path.equals("/logout") || path.startsWith("/api/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = extractToken(request);
 
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -61,6 +68,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("token".equals(cookie.getName())) {
+                    if (cookie.getValue() == null || cookie.getValue().isBlank()) {
+                        return null;
+                    }
                     return cookie.getValue();
                 }
             }

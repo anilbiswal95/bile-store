@@ -9,6 +9,7 @@ import com.bike.store.product.entity.Product;
 import com.bike.store.product.repository.CategoryRepository;
 import com.bike.store.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j // CHANGED: Added @Slf4j for logging
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -68,6 +70,7 @@ public class ProductService {
     @Transactional
     @CacheEvict(value = {"products", "productDetail"}, allEntries = true)
     public ProductDto createProduct(ProductCreateDto dto) {
+        log.info("Creating product with name: {}, categoryId: {}", dto.getName(), dto.getCategoryId());
         Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
@@ -82,8 +85,10 @@ public class ProductService {
                 .featured(dto.isFeatured())
                 .active(true)
                 .build();
-
-        return toDto(productRepository.save(product));
+        log.info("Saving product: {}", product.getName());
+        Product savedProduct = productRepository.save(product);
+        log.info("Product saved with ID: {}", savedProduct.getId());
+        return toDto(savedProduct);
     }
 
     @Transactional
@@ -125,15 +130,20 @@ public class ProductService {
 
     private ProductDto toDto(Product p) {
         ProductDto dto = new ProductDto();
-        dto.setId(p.getId());
-        dto.setName(p.getName());
-        dto.setDescription(p.getDescription());
-        dto.setPrice(p.getPrice());
-        dto.setImageUrl(p.getImageUrl());
-        dto.setCategoryName(p.getCategory() != null ? p.getCategory().getName() : null);
-        dto.setBikeModel(p.getBikeModel());
-        dto.setStock(p.getStock());
-        dto.setFeatured(p.isFeatured());
+        if (p != null) {
+            dto.setId(p.getId());
+            dto.setName(p.getName());
+            dto.setDescription(p.getDescription());
+            dto.setPrice(p.getPrice());
+            dto.setImageUrl(p.getImageUrl());
+            dto.setCategoryName(p.getCategory() != null ? p.getCategory().getName() : null);
+            dto.setBikeModel(p.getBikeModel());
+            dto.setStock(p.getStock());
+            dto.setFeatured(p.isFeatured());
+        }
+        else {
+            log.warn("Attempted to convert null Product to ProductDto");
+        }
         return dto;
     }
 

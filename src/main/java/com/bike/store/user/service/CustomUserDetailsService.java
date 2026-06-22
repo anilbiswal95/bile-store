@@ -34,11 +34,18 @@ public class CustomUserDetailsService implements UserDetailsService {
                         .map(role -> new SimpleGrantedAuthority(role.name()))
                         .collect(Collectors.toList())
         );*/
-        return new CustomUserDetails(
+       /* return new CustomUserDetails(
+                user,
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.name()))
+                        .collect(Collectors.toList())
+        );*/
+        return CustomUserDetails.fromUser(
                 user,
                 user.getRoles().stream()
                         .map(role -> new SimpleGrantedAuthority(role.name()))
                         .collect(Collectors.toList())
         );
+
     }
 }

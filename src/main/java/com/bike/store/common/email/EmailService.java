@@ -53,25 +53,32 @@ public class EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            
+
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setFrom("noreply@bikestore.com");
-            
-            // Create Thymeleaf context
+
             Context context = new Context();
             if (variables != null) {
                 context.setVariables(variables);
             }
-            
-            // Process template
-            String htmlContent = templateEngine.process("emails/" + templateName, context);
+
+            // Process template safely
+            String htmlContent;
+            try {
+                htmlContent = templateEngine.process("emails/" + templateName, context);
+            } catch (Exception tex) {
+                // Log template processing error and abort sending
+                System.err.println("Failed to process email template '" + templateName + "': " + tex.getMessage());
+                return;
+            }
+
             helper.setText(htmlContent, true);
-            
             mailSender.send(message);
-        } catch (MessagingException e) {
-            // Log error but don't fail the transaction
-            System.err.println("Failed to send HTML email to " + to + ": " + e.getMessage());
+        } catch (MessagingException mex) {
+            System.err.println("Failed to send HTML email to " + to + ": " + mex.getMessage());
+        } catch (Exception ex) {
+            System.err.println("Unexpected error while sending HTML email to " + to + ": " + ex.getMessage());
         }
     }
 }

@@ -40,7 +40,7 @@
         <div class="order-details">
             <div class="order-number">Order #<span th:text="${orderNumber}">ORD-12345678</span></div>
             <p>
-                <strong>Order Date:</strong> <span th:text="${#dates.format(orderDate, 'MMM dd, yyyy')}">Date</span><br>
+                <strong>Order Date:</strong> <span th:text="${#temporals.format(orderDate, 'MMM dd, yyyy')}">Date</span><br>
                 <strong>Total Amount:</strong> <span th:text="'₹' + ${#numbers.formatDecimal(totalAmount, 1, 2)}">₹0.00</span>
             </p>
         </div>

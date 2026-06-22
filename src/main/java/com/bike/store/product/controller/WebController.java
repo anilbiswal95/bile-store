@@ -167,4 +167,23 @@ public class WebController {
     public String adminPage() {
         return "admin/dashboard";
     }
+
+    @GetMapping("/orders/{id}")
+    public String orderDetail(@PathVariable("id") Long id, Model model, Principal principal) {
+        if (principal == null) {
+            // Not logged in — redirect to login or show message
+            model.addAttribute("message", "Please log in to view your order");
+            return "login";
+        }
+
+        try {
+            OrderDto order = orderService.getOrderForUser(id, principal.getName());
+            model.addAttribute("order", order);
+            return "order-detail"; // create templates/order-detail.html or reuse an existing view
+        } catch (ResourceNotFoundException ex) {
+            model.addAttribute("message", "Order not found");
+            return "not-found";
+        }
+    }
+
 }

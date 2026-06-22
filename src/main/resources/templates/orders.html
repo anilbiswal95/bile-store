@@ -193,7 +193,8 @@
                         </span>
                     </td>
                     <td th:text="${#numbers.formatDecimal(order.totalAmount,1,2)}">₹0.00</td>
-                    <td th:text="${#dates.format(order.createdAt, 'dd-MM-yyyy')}">01-01-2026</td>
+                    <td th:text="${#temporals.format(order.createdAt, 'dd-MM-yyyy')}">01-01-2026</td>
+
                     <td>
                         <a th:href="@{/orders/{id}(id=${order.id})}" class="btn btn-sm btn-outline-primary">View</a>
                     </td>

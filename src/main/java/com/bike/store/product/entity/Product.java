@@ -18,6 +18,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// CHANGED: Added @AttributeOverride to customize ID column mapping if needed
+@AttributeOverride(name = "id", column = @Column(name = "id"))
 public class Product extends BaseEntity {
 
     @Column(nullable = false)

@@ -1,5 +1,6 @@
 package com.bike.store.order.service;
 
+import com.bike.store.admin.dto.OrderResponseDto;
 import com.bike.store.cart.entity.Cart;
 import com.bike.store.cart.entity.CartItem;
 import com.bike.store.cart.repository.CartRepository;
@@ -20,6 +21,8 @@ import com.bike.store.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,7 +105,7 @@ public class OrderService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Page<Order> orders = orderRepository.findByUserId(user.getId(), PageRequest.of(page, size));
+        Page<Order> orders = orderRepository.findByUserIdWithItems(user.getId(), PageRequest.of(page, size));
         return orders.getContent().stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
@@ -134,11 +137,21 @@ public class OrderService {
             Map<String, Object> variables = new HashMap<>();
             variables.put("customerName", user.getFullName());
             variables.put("orderNumber", order.getOrderNumber());
-            variables.put("orderDate", order.getCreatedAt());
+            variables.put("orderDate", order.getCreatedAt()); // LocalDateTime is fine with #temporals
             variables.put("shippingAddress", order.getShippingAddress());
             variables.put("paymentMethod", order.getPaymentMethod());
             variables.put("totalAmount", order.getTotalAmount());
-            variables.put("items", order.getItems());
+
+            // Convert items to simple DTOs or maps
+            List<Map<String, Object>> items = order.getItems().stream().map(it -> {
+                Map<String, Object> m = new HashMap<>();
+                m.put("productName", it.getProductName());
+                m.put("quantity", it.getQuantity());
+                m.put("price", it.getPrice());
+                m.put("subtotal", it.getPrice().multiply(BigDecimal.valueOf(it.getQuantity())));
+                return m;
+            }).collect(Collectors.toList());
+            variables.put("items", items);
 
             emailService.sendHtmlEmail(
                     user.getEmail(),
@@ -147,10 +160,10 @@ public class OrderService {
                     variables
             );
         } catch (Exception e) {
-            // Log error but don't fail the order creation
             System.err.println("Failed to send order confirmation email: " + e.getMessage());
         }
     }
+
 
     private OrderDto toDto(Order order) {
         OrderDto dto = new OrderDto();
@@ -175,4 +188,81 @@ public class OrderService {
 
         return dto;
     }
+
+    /**
+     * Return an order for a given id only if it belongs to the user with the given email.
+     * Throws ResourceNotFoundException if order not found or does not belong to the user.
+     */
+    public OrderDto getOrderForUser(Long id, String userEmail) {
+        Order order = orderRepository.findByIdWithItems(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        // Ensure the order belongs to the requesting user
+        if (order.getUser() == null || !order.getUser().getEmail().equalsIgnoreCase(userEmail)) {
+            throw new ResourceNotFoundException("Order not found");
+        }
+
+        return toDto(order);
+    }
+    /*public List<OrderResponseDto> getAllOrdersForAdmin(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return orderRepository.findAll(PageRequest.of(page, size))
+                .getContent()
+                .stream()
+                .map(order -> {
+                    OrderResponseDto dto = new OrderResponseDto();
+                    dto.setId(order.getId());
+                    dto.setOrderNumber(order.getOrderNumber());
+                    dto.setUserEmail(order.getUser().getEmail());
+                    dto.setStatus(order.getStatus().name());
+                    dto.setTotalAmount(order.getTotalAmount());
+                    dto.setCreatedAt(order.getCreatedAt());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }*/
+    /**
+     * CHANGED: Updated to use OrderResponseDto with eager loading
+     * Uses JOIN FETCH to load User data in the same query
+     */
+    @Transactional(readOnly = true)
+    public List<OrderResponseDto> getAllOrdersForAdmin(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        // CHANGED: Use custom query with JOIN FETCH to load user data eagerly
+        Page<Order> ordersPage = orderRepository.findAllWithUserAndItems(pageable);
+
+        return ordersPage.getContent().stream()
+                .map(this::convertToAdminOrderDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * CHANGED: New method to convert Order to OrderResponseDto
+     * Handles the User data safely since it's loaded eagerly
+     */
+    private OrderResponseDto convertToAdminOrderDto(Order order) {
+        OrderResponseDto dto = new OrderResponseDto();
+        dto.setId(order.getId());
+        dto.setOrderNumber(order.getOrderNumber());
+        dto.setStatus(order.getStatus().name());
+        dto.setTotalAmount(order.getTotalAmount());
+        dto.setShippingAddress(order.getShippingAddress());
+        dto.setPaymentMethod(order.getPaymentMethod());
+        dto.setCreatedAt(order.getCreatedAt());
+        dto.setUpdatedAt(order.getUpdatedAt());
+
+        // CHANGED: Safe access to user since it's loaded via JOIN FETCH
+        User user = order.getUser();
+        if (user != null) {
+            dto.setUserEmail(user.getEmail());
+            dto.setUserName(user.getFullName());
+        } else {
+            dto.setUserEmail("N/A");
+            dto.setUserName("N/A");
+        }
+
+        return dto;
+    }
+
 }

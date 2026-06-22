@@ -1,5 +1,6 @@
 package com.bike.store.admin.controller;
 
+import com.bike.store.admin.dto.OrderResponseDto;
 import com.bike.store.order.entity.OrderStatus;
 import com.bike.store.order.service.OrderService;
 import com.bike.store.product.dto.CategoryCreateUpdateDto;
@@ -89,6 +90,18 @@ public class AdminApiController {
     }
 
     // ==================== ORDER ENDPOINTS ====================
+
+    /**
+     * CHANGED: Uses the corrected service method with @EntityGraph
+     */
+    @GetMapping("/orders")
+    public ResponseEntity<List<OrderResponseDto>> getAllOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        // CHANGED: Using the corrected method
+        List<OrderResponseDto> orders = orderService.getAllOrdersForAdmin(page, size);
+        return ResponseEntity.ok(orders);
+    }
 
     @PutMapping("/orders/{id}/status")
     public ResponseEntity<?> updateOrderStatus(@PathVariable Long id,
