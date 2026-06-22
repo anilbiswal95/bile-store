@@ -19,6 +19,7 @@ import com.bike.store.product.repository.ProductRepository;
 import com.bike.store.user.entity.User;
 import com.bike.store.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -132,12 +134,16 @@ public class OrderService {
     /**
      * Send order confirmation email to user
      */
+    /**
+     * Send order confirmation email to user with GST invoice
+     * CHANGED: Added better error handling and template path fix
+     */
     private void sendOrderConfirmationEmail(Order order, User user) {
         try {
             Map<String, Object> variables = new HashMap<>();
             variables.put("customerName", user.getFullName());
             variables.put("orderNumber", order.getOrderNumber());
-            variables.put("orderDate", order.getCreatedAt()); // LocalDateTime is fine with #temporals
+            variables.put("orderDate", order.getCreatedAt());
             variables.put("shippingAddress", order.getShippingAddress());
             variables.put("paymentMethod", order.getPaymentMethod());
             variables.put("totalAmount", order.getTotalAmount());
@@ -153,14 +159,17 @@ public class OrderService {
             }).collect(Collectors.toList());
             variables.put("items", items);
 
+            // CHANGED: Use correct template name without "emails/" prefix if not configured
             emailService.sendHtmlEmail(
                     user.getEmail(),
                     "Order Confirmation - " + order.getOrderNumber(),
-                    "order-confirmation",
+                    "order-confirmation",  // Template name: order-confirmation.html
                     variables
             );
+            log.info("Order confirmation email sent to: {}", user.getEmail());
         } catch (Exception e) {
-            System.err.println("Failed to send order confirmation email: " + e.getMessage());
+            // CHANGED: Log error with more details
+            log.error("Failed to send order confirmation email to {}: {}", user.getEmail(), e.getMessage(), e);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.bike.store.common.email;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;  // CHANGED: Add this import
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -8,47 +9,32 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.Map;
 
-/**
- * Service for sending emails.
- * Supports both plain text and HTML emails with Thymeleaf templates.
- */
 @Service
 @RequiredArgsConstructor
+@Slf4j  // CHANGED: Added @Slf4j for logging
 public class EmailService {
 
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
-    /**
-     * Send a simple text email.
-     */
     public void sendSimpleEmail(String to, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(text);
-        message.setFrom("noreply@bikestore.com");
-        
         try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(text);
+            message.setFrom("noreply@bobbyridecustoms.com");  // CHANGED: Updated domain
+
             mailSender.send(message);
+            log.info("Simple email sent to: {}", to);
         } catch (Exception e) {
-            // Log error but don't fail the transaction
-            System.err.println("Failed to send email to " + to + ": " + e.getMessage());
+            log.error("Failed to send simple email to {}: {}", to, e.getMessage(), e);
         }
     }
 
-    /**
-     * Send an HTML email using Thymeleaf template.
-     * 
-     * @param to Recipient email address
-     * @param subject Email subject
-     * @param templateName Template name without extension (e.g., "order-confirmation")
-     * @param variables Variables to pass to template
-     */
     public void sendHtmlEmail(String to, String subject, String templateName, Map<String, Object> variables) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -56,30 +42,50 @@ public class EmailService {
 
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setFrom("noreply@bikestore.com");
+            helper.setFrom("noreply@bobbyridecustoms.com");  // CHANGED: Updated domain
 
             Context context = new Context();
             if (variables != null) {
                 context.setVariables(variables);
             }
 
-            // Process template safely
+            // CHANGED: Try different template paths
             String htmlContent;
             try {
+                // Try with "emails/" prefix first
                 htmlContent = templateEngine.process("emails/" + templateName, context);
-            } catch (Exception tex) {
-                // Log template processing error and abort sending
-                System.err.println("Failed to process email template '" + templateName + "': " + tex.getMessage());
-                return;
+            } catch (Exception e1) {
+                log.warn("Template not found in 'emails/' folder, trying root: {}", e1.getMessage());
+                try {
+                    // Try without prefix (root templates folder)
+                    htmlContent = templateEngine.process(templateName, context);
+                } catch (Exception e2) {
+                    log.error("Template not found: {}", templateName);
+                    // Create fallback HTML content
+                    htmlContent = createFallbackEmailContent(variables);
+                }
             }
 
             helper.setText(htmlContent, true);
             mailSender.send(message);
-        } catch (MessagingException mex) {
-            System.err.println("Failed to send HTML email to " + to + ": " + mex.getMessage());
-        } catch (Exception ex) {
-            System.err.println("Unexpected error while sending HTML email to " + to + ": " + ex.getMessage());
+            log.info("HTML email sent to: {}", to);
+        } catch (Exception e) {
+            log.error("Failed to send HTML email to {}: {}", to, e.getMessage(), e);
         }
     }
-}
 
+    // CHANGED: Added fallback method when template is not found
+    private String createFallbackEmailContent(Map<String, Object> variables) {
+        StringBuilder html = new StringBuilder();
+        html.append("<html><body>");
+        html.append("<h1>Order Confirmation - BOBBY RIDE CUSTOMS</h1>");
+        html.append("<p>Dear ").append(variables.getOrDefault("customerName", "Customer")).append(",</p>");
+        html.append("<p>Thank you for your order! Order #").append(variables.getOrDefault("orderNumber", "N/A")).append("</p>");
+        html.append("<p>Total Amount: ₹").append(variables.getOrDefault("totalAmount", "0.00")).append("</p>");
+        html.append("<p>Shipping Address: ").append(variables.getOrDefault("shippingAddress", "N/A")).append("</p>");
+        html.append("<p>Payment Method: ").append(variables.getOrDefault("paymentMethod", "COD")).append("</p>");
+        html.append("<p>We'll send you a tracking number once your order ships.</p>");
+        html.append("</body></html>");
+        return html.toString();
+    }
+}
