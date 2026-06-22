@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -108,5 +109,9 @@ public class UserService {
         dto.setPinCode(a.getPinCode());
         dto.setDefault(a.isDefault());
         return dto;
+    }
+
+    public Optional<User> getByEmail(String username) {
+        return userRepository.findByEmail(username);
     }
 }

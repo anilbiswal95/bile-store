@@ -1,38 +1,380 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${product.name} + ' - BikeStore'">Product - BikeStore</title>
+    <title th:text="${product.name} + ' - BOBBY RIDE CUSTOMS'">Product - BOBBY RIDE CUSTOMS</title>
+
+    <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        .btn-primary {
-          background-color: #e63946;
-          border-color: #e63946;
+        :root {
+            --primary: #e63946;
+            --primary-dark: #c62835;
+            --primary-light: #ff6b7a;
+            --dark: #0a0a0a;
+            --dark-gray: #1a1a1a;
+            --text-light: #ffffff;
+            --text-muted: #b0b0b0;
+            --gradient-primary: linear-gradient(135deg, #e63946 0%, #c62835 100%);
+            --border-radius: 16px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .btn-primary:hover {
-          background-color: #d62828;
-          border-color: #d62828;
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--gradient-primary); border-radius: 10px; }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            font-family: 'Inter', sans-serif;
+            background: rgba(10, 10, 10, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0.8rem 0;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .navbar-brand img {
+            height: 52px;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .navbar-brand img:hover {
+            transform: scale(1.05) rotate(-3deg);
+        }
+
+        .navbar-brand .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .navbar-brand .brand-main {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-brand .brand-sub {
+            font-size: 0.55rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            -webkit-text-fill-color: var(--text-muted);
+        }
+
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.7) !important;
+            transition: var(--transition);
+            padding: 0.5rem 1rem !important;
+            position: relative;
+        }
+
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: var(--transition);
+            transform: translateX(-50%);
+        }
+
+        .navbar-nav .nav-link:hover::after,
+        .navbar-nav .nav-link.active::after {
+            width: 60%;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--text-light) !important;
+        }
+
+        .navbar-nav .nav-link i {
+            margin-right: 6px;
+        }
+
+        .navbar-search .form-control {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-light);
+            border-radius: 50px;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            min-width: 250px;
+        }
+
+        .navbar-search .form-control:focus {
+            background: rgba(255,255,255,0.12);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.15);
+        }
+
+        .navbar-search .form-control::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .navbar-search .btn-outline-light {
+            border-radius: 50px;
+            padding: 0.6rem 1.2rem;
+            border-color: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+            transition: var(--transition);
+        }
+
+        .navbar-search .btn-outline-light:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb {
+            padding: 20px 0;
+            margin-bottom: 0;
+        }
+
+        .breadcrumb-item a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--primary-light);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--text-light);
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            color: var(--text-muted);
+        }
+
+        /* ===== PRODUCT DETAIL ===== */
+        .product-image-placeholder {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .product-image-placeholder i {
+            font-size: 8rem;
+            color: rgba(255,255,255,0.05);
+        }
+
+        .product-detail h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #e63946 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .product-detail .badge-category {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-weight: 400;
+            font-size: 0.85rem;
+        }
+
+        .product-detail .badge-model {
+            background: rgba(230, 57, 70, 0.1);
+            color: var(--primary-light);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .product-detail .price {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            color: var(--primary-light);
+            font-weight: 700;
+        }
+
+        .product-detail .description {
+            color: var(--text-muted);
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .product-detail .stock-badge {
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+
+        .product-detail .stock-badge.in-stock {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .product-detail .stock-badge.out-of-stock {
+            background: rgba(230, 57, 70, 0.1);
+            color: var(--primary-light);
+        }
+
+        .product-detail .form-control {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-light);
+            border-radius: 12px;
+            padding: 0.6rem 1rem;
+            width: 80px;
+        }
+
+        .product-detail .form-control:focus {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.15);
+        }
+
+        .btn-primary-custom {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 0.8rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            box-shadow: 0 8px 30px rgba(230, 57, 70, 0.3);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(230, 57, 70, 0.4);
+            color: white;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: rgba(0,0,0,0.9);
+            padding: 3rem 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 3rem;
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 300;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .navbar-brand .brand-main {
+                font-size: 0.9rem;
+            }
+            .navbar-brand .brand-sub {
+                font-size: 0.45rem;
+            }
+            .navbar-search .form-control {
+                min-width: auto;
+            }
+            .product-detail h2 {
+                font-size: 1.6rem;
+            }
+            .product-detail .price {
+                font-size: 2rem;
+            }
+            .product-image-placeholder {
+                padding: 2rem;
+            }
+            .product-image-placeholder i {
+                font-size: 5rem;
+            }
         }
     </style>
 </head>
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+<nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/"><i class="bi bi-bicycle"></i> BikeStore</a>
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="/products">Products</a></li>
-            <li class="nav-item"><a class="nav-link" href="/cart"><i class="bi bi-cart3"></i> Cart</a></li>
-            <li class="nav-item"><a class="nav-link" href="/login"><i class="bi bi-person"></i> Login</a></li>
-        </ul>
+        <a class="navbar-brand" href="/">
+            <img src="/images/logo.jpg" alt="BOBBY RIDE CUSTOMS Logo">
+            <div class="brand-text">
+                <span class="brand-main">BOBBY RIDE</span>
+                <span class="brand-sub">CUSTOMS</span>
+            </div>
+        </a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <form class="d-flex mx-auto navbar-search" action="/search" method="get" role="search">
+                <input class="form-control" type="search" name="q" placeholder="Search accessories..." aria-label="Search">
+                <button class="btn btn-outline-light ms-2" type="submit"><i class="bi bi-search"></i></button>
+            </form>
+
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/products"><i class="bi bi-grid-3x3-gap"></i> Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="/cart"><i class="bi bi-cart3"></i> Cart</a></li>
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" href="/login"><i class="bi bi-person"></i> Login</a>
+                </li>
+                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i>
+                        <span sec:authentication="principal.fullName"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="/profile"><i class="bi bi-person me-2"></i>Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 
 <!-- Breadcrumb -->
-<div class="container py-5">
+<div class="container">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -40,39 +382,42 @@
             <li class="breadcrumb-item active" th:text="${product.name}">Product</li>
         </ol>
     </nav>
+</div>
 
-    <div class="row">
+<!-- Product Detail -->
+<div class="container py-4">
+    <div class="row g-4">
         <!-- Product Image -->
-        <div class="col-md-5 text-center">
-            <div class="bg-light rounded p-5">
-                <i class="bi bi-box-seam" style="font-size:8rem;color:#adb5bd;"></i>
+        <div class="col-md-5">
+            <div class="product-image-placeholder">
+                <i class="bi bi-box-seam"></i>
             </div>
         </div>
 
         <!-- Product Details -->
-        <div class="col-md-7">
+        <div class="col-md-7 product-detail">
             <h2 th:text="${product.name}">Product Name</h2>
-            <span class="badge bg-secondary" th:text="${product.categoryName}">Category</span>
-            <span class="badge bg-info text-dark" th:text="'Fits: ' + ${product.bikeModel}">Model</span>
+            <div class="mb-3">
+                <span class="badge-category me-2" th:text="${product.categoryName}">Category</span>
+                <span class="badge-model" th:text="'Fits: ' + ${product.bikeModel}">Model</span>
+            </div>
 
-            <h3 class="text-danger mt-3">
-                ₹<span th:text="${#numbers.formatDecimal(product.price,1,0)}">0</span>
-            </h3>
+            <div class="price mb-3">₹<span th:text="${#numbers.formatDecimal(product.price, 1, 0)}">0</span></div>
 
-            <p class="mt-3" th:text="${product.description}">Description</p>
+            <p class="description" th:text="${product.description}">Description</p>
 
-            <p th:if="${product.stock > 0}" class="text-success fw-semibold">
-                <i class="bi bi-check-circle"></i> In Stock
-                (<span th:text="${product.stock}">0</span> available)
-            </p>
-            <p th:if="${product.stock == 0}" class="text-danger fw-semibold">
-                <i class="bi bi-x-circle"></i> Out of Stock
-            </p>
+            <div class="mb-3">
+                <span th:if="${product.stock > 0}" class="stock-badge in-stock">
+                    <i class="bi bi-check-circle"></i> In Stock (<span th:text="${product.stock}">0</span> available)
+                </span>
+                <span th:if="${product.stock == 0}" class="stock-badge out-of-stock">
+                    <i class="bi bi-x-circle"></i> Out of Stock
+                </span>
+            </div>
 
             <div class="d-flex align-items-center gap-3 mt-4" th:if="${product.stock > 0}">
-                <input type="number" id="qty" value="1" min="1" th:max="${product.stock}"
-                       class="form-control" style="width:80px;">
-                <button class="btn btn-primary btn-lg" onclick="addToCart()">
+                <input type="number" id="qty" value="1" min="1" th:max="${product.stock}" class="form-control text-center">
+                <button class="btn btn-primary-custom" onclick="addToCart()">
                     <i class="bi bi-cart-plus"></i> Add to Cart
                 </button>
             </div>
@@ -81,9 +426,9 @@
 </div>
 
 <!-- Footer -->
-<footer class="bg-dark text-light py-4 mt-5">
+<footer class="footer">
     <div class="container text-center">
-        <p class="mb-0">© 2026 BikeStore. Premium Motorcycle Accessories.</p>
+        <p class="mb-0">© 2026 BOBBY RIDE CUSTOMS. Premium Motorcycle Accessories.</p>
     </div>
 </footer>
 
@@ -94,24 +439,23 @@
     const productId = [[${product.id}]];
 
     function addToCart() {
-      const qty = document.getElementById("qty").value;
-      fetch("/api/cart/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: productId, quantity: parseInt(qty) })
-      })
-      .then(res => {
-        if (res.ok) {
-          alert("Added to cart!");
-          window.location.href = "/cart";
-        } else if (res.status === 403) {
-          window.location.href = "/login";
-        } else {
-          res.json().then(d => alert(d.message || "Error"));
-        }
-      });
+        const qty = document.getElementById("qty").value;
+        fetch("/api/cart/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId: productId, quantity: parseInt(qty) })
+        })
+        .then(res => {
+            if (res.ok) {
+                alert("Added to cart!");
+                window.location.href = "/cart";
+            } else if (res.status === 403) {
+                window.location.href = "/login";
+            } else {
+                res.json().then(d => alert(d.message || "Error"));
+            }
+        });
     }
 </script>
-
 </body>
 </html>

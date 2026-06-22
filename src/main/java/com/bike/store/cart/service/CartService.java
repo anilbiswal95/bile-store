@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -139,4 +140,30 @@ public class CartService {
 
         return dto;
     }
+    public CartDto getCartForUser(Long userId) {
+        CartDto cartDto = new CartDto();
+
+        Cart cart = cartRepository.findByUserIdWithItems(userId)
+                .orElseGet(() -> new Cart()); // empty cart if none
+
+        List<CartDto.CartItemDto> items = cart.getItems().stream().map(ci -> {
+            CartDto.CartItemDto dto = new CartDto.CartItemDto();
+            dto.setProductId(ci.getProduct().getId());
+            dto.setProductName(ci.getProduct().getName());
+            dto.setPrice(ci.getProduct().getPrice());
+            dto.setQuantity(ci.getQuantity());
+            dto.setSubtotal(ci.getProduct().getPrice()
+                    .multiply(BigDecimal.valueOf(ci.getQuantity())));
+            dto.setImageUrl(ci.getProduct().getImageUrl());
+            return dto;
+        }).collect(Collectors.toList());
+
+        cartDto.setItems(items);
+        cartDto.setTotal(items.stream()
+                .map(CartDto.CartItemDto::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+
+        return cartDto;
+    }
+
 }

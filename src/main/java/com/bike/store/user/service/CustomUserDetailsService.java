@@ -2,6 +2,7 @@ package com.bike.store.user.service;
 
 import com.bike.store.user.entity.User;
 import com.bike.store.user.repository.UserRepository;
+import com.bike.store.user.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-        return new org.springframework.security.core.userdetails.User(
+        /*return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
                 user.isEnabled(),
@@ -32,6 +33,19 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getRoles().stream()
                         .map(role -> new SimpleGrantedAuthority(role.name()))
                         .collect(Collectors.toList())
+        );*/
+       /* return new CustomUserDetails(
+                user,
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.name()))
+                        .collect(Collectors.toList())
+        );*/
+        return CustomUserDetails.fromUser(
+                user,
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.name()))
+                        .collect(Collectors.toList())
         );
+
     }
 }

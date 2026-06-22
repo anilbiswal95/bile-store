@@ -3,6 +3,8 @@ package com.bike.store.product.dto;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
 import lombok.Data;
 import java.math.BigDecimal;
 
@@ -25,8 +27,10 @@ public class ProductCreateDto {
 
     private String bikeModel;
 
-    @NotNull
+    // CHANGED: Changed from Integer to int with validation
+    @NotNull(message = "Stock is required")
+    @PositiveOrZero(message = "Stock must be 0 or greater")
     private Integer stock;
 
-    private boolean featured;
+    private boolean featured= false;
 }

@@ -1,104 +1,1494 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - BikeStore</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Admin Dashboard - BOBBY RIDE CUSTOMS</title>
+
+    <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        .btn-primary {
-            background-color: #e63946;
-            border-color: #e63946;
+        :root {
+            --primary: #e63946;
+            --primary-dark: #c62835;
+            --primary-light: #ff6b7a;
+            --dark: #0a0a0a;
+            --dark-gray: #1a1a1a;
+            --text-light: #ffffff;
+            --text-muted: #b0b0b0;
+            --gradient-primary: linear-gradient(135deg, #e63946 0%, #c62835 100%);
+            --border-radius: 16px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--gradient-primary); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            font-family: 'Inter', sans-serif;
+            background: rgba(10, 10, 10, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0.8rem 0;
+            transition: var(--transition);
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.98) !important;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .navbar-brand img {
+            height: 52px;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .navbar-brand img:hover {
+            transform: scale(1.05) rotate(-3deg);
+        }
+
+        .navbar-brand .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .navbar-brand .brand-main {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-brand .brand-sub {
+            font-size: 0.55rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            -webkit-text-fill-color: var(--text-muted);
+        }
+
+        .navbar .nav-link {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.7) !important;
+            transition: var(--transition);
+            padding: 0.5rem 1rem !important;
+            position: relative;
+        }
+
+        .navbar .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: var(--transition);
+            transform: translateX(-50%);
+        }
+
+        .navbar .nav-link:hover::after,
+        .navbar .nav-link.active::after {
+            width: 60%;
+        }
+
+        .navbar .nav-link:hover {
+            color: var(--text-light) !important;
+        }
+
+        .navbar .nav-link i {
+            margin-right: 6px;
+        }
+
+        .dropdown-menu {
+            background: var(--dark-gray);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .dropdown-menu .dropdown-item {
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .dropdown-menu .dropdown-item:hover {
+            background: rgba(230, 57, 70, 0.1);
+            color: var(--text-light);
+        }
+
+        .dropdown-menu .dropdown-divider {
+            border-color: rgba(255,255,255,0.05);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            background: rgba(255,255,255,0.03);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            min-height: calc(100vh - 76px);
+            padding: 30px 0 20px 0;
+            position: sticky;
+            top: 76px;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.6);
+            padding: 14px 24px;
+            border-left: 3px solid transparent;
+            transition: var(--transition);
+            font-weight: 500;
+            font-size: 1rem;
+            border-radius: 0 12px 12px 0;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(230, 57, 70, 0.08);
+            border-left-color: var(--primary);
+            color: var(--text-light);
+        }
+
+        .sidebar .nav-link i {
+            width: 28px;
+            text-align: center;
+            margin-right: 14px;
+            color: var(--text-muted);
+            transition: var(--transition);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar .nav-link:hover i,
+        .sidebar .nav-link.active i {
+            color: var(--primary-light);
+        }
+
+        .sidebar .nav-link .nav-text {
+            flex: 1;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            padding: 30px;
+        }
+
+        .main-content h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #e63946 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .card:hover {
+            border-color: rgba(230, 57, 70, 0.2);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+        }
+
+        .card-header {
+            background: rgba(255,255,255,0.03);
+            border-bottom: 2px solid rgba(230, 57, 70, 0.3);
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+            color: var(--text-light);
+        }
+
+        .card-header .card-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-label {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .form-control,
+        .form-select {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-light);
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.15);
+            color: var(--text-light);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .form-select option {
+            background: var(--dark);
+            color: var(--text-light);
+        }
+
+        .form-check-label {
+            color: var(--text-muted);
+        }
+
+        .form-check-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-admin {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.2);
+        }
+
+        .btn-admin:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(230, 57, 70, 0.4);
+            color: white;
+        }
+
+        .btn-admin-sm {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .btn-admin-sm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
+            color: white;
+        }
+
+        /* CHANGED: Added refresh button with loading state */
+        .btn-refresh {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .btn-refresh:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--primary);
+            color: var(--text-light);
+            transform: translateY(-2px);
+        }
+
+        .btn-refresh:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-outline-secondary {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            padding: 0.6rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .btn-outline-secondary:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--primary);
+            color: var(--text-light);
+            transform: translateY(-3px);
+        }
+
+        .btn-warning {
+            background: rgba(255, 193, 7, 0.15);
+            border: 1px solid rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border-radius: 50px;
+            padding: 0.3rem 0.8rem;
+            transition: var(--transition);
+        }
+
+        .btn-warning:hover {
+            background: rgba(255, 193, 7, 0.25);
+            color: #ffc107;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: rgba(230, 57, 70, 0.15);
+            border: 1px solid rgba(230, 57, 70, 0.2);
+            color: var(--primary-light);
+            border-radius: 50px;
+            padding: 0.3rem 0.8rem;
+            transition: var(--transition);
+        }
+
+        .btn-danger:hover {
+            background: rgba(230, 57, 70, 0.25);
+            color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .btn-success-sm {
+            background: rgba(40, 167, 69, 0.15);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border-radius: 50px;
+            padding: 0.3rem 0.8rem;
+            transition: var(--transition);
+        }
+
+        .btn-success-sm:hover {
+            background: rgba(40, 167, 69, 0.25);
+            color: #28a745;
+            transform: translateY(-2px);
+        }
+
+        /* ===== TAB STYLING ===== */
+        .nav-tabs {
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-muted);
+            font-weight: 500;
+            border: none;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-bottom-color: var(--primary);
+            color: var(--text-light);
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-light);
+            border-bottom-color: var(--primary);
+            background: transparent;
+        }
+
+        .nav-tabs .nav-link i {
+            margin-right: 6px;
+        }
+
+        /* ===== TABLE STYLING ===== */
+        .table {
+            color: var(--text-light);
+            margin-bottom: 0;
+        }
+
+        .table thead {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .table thead th {
+            border-bottom: 2px solid rgba(255,255,255,0.06);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.8rem 0.5rem;
+        }
+
+        .table td {
+            border-color: rgba(255,255,255,0.05);
+            vertical-align: middle;
+            padding: 0.8rem 0.5rem;
+        }
+
+        .table-hover tbody tr:hover {
+            background: rgba(230, 57, 70, 0.05);
+        }
+
+        /* ===== STATUS DROPDOWN - IMPROVED VISIBILITY ===== */
+        .status-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-width: 80px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .status-badge.status-pending {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+
+        .status-badge.status-confirmed {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+
+        .status-badge.status-processing {
+            background: rgba(13, 202, 240, 0.15);
+            color: #0dcaf0;
+            border: 1px solid rgba(13, 202, 240, 0.2);
+        }
+
+        .status-badge.status-shipped {
+            background: rgba(13, 110, 253, 0.15);
+            color: #0d6efd;
+            border: 1px solid rgba(13, 110, 253, 0.2);
+        }
+
+        .status-badge.status-delivered {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.25);
+        }
+
+        .status-badge.status-cancelled {
+            background: rgba(230, 57, 70, 0.15);
+            color: var(--primary-light);
+            border: 1px solid rgba(230, 57, 70, 0.2);
+        }
+
+        .status-dropdown {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: inherit;
+            border-radius: 50px;
+            padding: 0.25rem 0.8rem;
+            font-size: 0.7rem;
+            transition: var(--transition);
+            cursor: pointer;
+            min-width: 110px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .status-dropdown:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.15);
+        }
+
+        .status-dropdown option {
+            background: var(--dark-gray);
+            color: var(--text-light);
+            padding: 4px 8px;
+        }
+
+        .status-dropdown option:hover {
+            background: rgba(230, 57, 70, 0.1);
+        }
+
+        .status-dropdown option[value="PENDING"] { color: #ffc107; }
+        .status-dropdown option[value="CONFIRMED"] { color: #28a745; }
+        .status-dropdown option[value="PROCESSING"] { color: #0dcaf0; }
+        .status-dropdown option[value="SHIPPED"] { color: #0d6efd; }
+        .status-dropdown option[value="DELIVERED"] { color: #28a745; }
+        .status-dropdown option[value="CANCELLED"] { color: var(--primary-light); }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+        }
+
+        .toast .toast-body {
+            color: var(--text-light);
+        }
+
+        .toast.bg-success .toast-body {
+            color: #28a745;
+        }
+
+        .toast.bg-danger .toast-body {
+            color: var(--primary-light);
+        }
+
+        .toast.bg-warning .toast-body {
+            color: #ffc107;
+        }
+
+        .toast.bg-info .toast-body {
+            color: #0dcaf0;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-content {
+            background: var(--dark-gray);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 1.5rem;
+        }
+
+        .modal-header .modal-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .modal-header .btn-close {
+            filter: invert(1) brightness(2);
+            opacity: 0.6;
+        }
+
+        .modal-header .btn-close:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding: 1rem 1.5rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: rgba(0,0,0,0.9);
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 2rem;
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 300;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+                position: relative;
+                top: 0;
+                margin-bottom: 20px;
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+                padding: 15px 0;
+            }
+            .sidebar .nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .sidebar .nav-link {
+                padding: 10px 16px;
+                border-left: none;
+                border-bottom: 2px solid transparent;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                white-space: nowrap;
+            }
+            .sidebar .nav-link:hover,
+            .sidebar .nav-link.active {
+                border-left: none;
+                border-bottom-color: var(--primary);
+            }
+            .sidebar .nav-link i {
+                margin-right: 8px;
+                font-size: 1rem;
+            }
+            .main-content {
+                padding: 15px;
+            }
+            .navbar-brand .brand-main {
+                font-size: 0.9rem;
+            }
+            .navbar-brand .brand-sub {
+                font-size: 0.45rem;
+            }
+            .navbar-brand img {
+                height: 40px;
+            }
+            .toast-container {
+                top: 70px;
+                right: 10px;
+                left: 10px;
+            }
+            .main-content h3 {
+                font-size: 1.4rem;
+            }
+            .table {
+                font-size: 0.85rem;
+            }
+            .btn-admin,
+            .btn-outline-secondary {
+                padding: 0.5rem 1.2rem;
+                font-size: 0.85rem;
+            }
+            .status-dropdown {
+                font-size: 0.65rem;
+                min-width: 90px;
+                padding: 0.2rem 0.6rem;
+            }
+            .status-badge {
+                font-size: 0.6rem;
+                min-width: 60px;
+                padding: 0.2rem 0.6rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 1rem;
+            }
+            .nav-tabs .nav-link {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.85rem;
+            }
+            .sidebar .nav-link {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            .sidebar .nav-link i {
+                margin-right: 6px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/"><i class="bi bi-bicycle"></i> BikeStore Admin</a>
-        <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="logout()">Logout</a>
-            </li>
-        </ul>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand" href="/">
+            <img alt="BOBBY RIDE CUSTOMS Logo" src="/images/logo.jpg">
+            <div class="brand-text">
+                <span class="brand-main">BOBBY RIDE</span>
+                <span class="brand-sub">CUSTOMS</span>
+            </div>
+        </a>
+
+        <button class="navbar-toggler border-0" data-bs-target="#adminNavbar" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="adminNavbar">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <span class="nav-link" sec:authentication="principal.fullName">
+                        <i class="bi bi-person-circle"></i> <span sec:authentication="principal.fullName"></span>
+                    </span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 
-<div class="container py-4">
-    <h3>Admin Dashboard</h3>
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container"></div>
 
-    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="products-tab-btn" data-bs-toggle="tab" data-bs-target="#products-tab" type="button" role="tab">Products</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="orders-tab-btn" data-bs-toggle="tab" data-bs-target="#orders-tab" type="button" role="tab">Orders</button>
-        </li>
-    </ul>
-
-    <div class="tab-content">
-        <div class="tab-pane fade show active" id="products-tab" role="tabpanel">
-            <h5>Add Product</h5>
-            <form id="productForm" class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <input type="text" id="pName" class="form-control" placeholder="Name" required>
-                </div>
-                <div class="col-md-2">
-                    <input type="number" id="pPrice" class="form-control" placeholder="Price" required>
-                </div>
-                <div class="col-md-2">
-                    <input type="number" id="pStock" class="form-control" placeholder="Stock" required>
-                </div>
-                <div class="col-md-2">
-                    <input type="number" id="pCatId" class="form-control" placeholder="Category ID" required>
-                </div>
-                <div class="col-md-2">
-                    <input type="text" id="pBike" class="form-control" placeholder="Bike Model">
-                </div>
-                <div class="col-md-6">
-                    <textarea id="pDesc" class="form-control" placeholder="Description"></textarea>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-check mt-2">
-                        <input type="checkbox" id="pFeatured" class="form-check-input">
-                        <label class="form-check-label" for="pFeatured">Featured</label>
+<!-- ===== EDIT CATEGORY MODAL ===== -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCategoryModalLabel"><i class="bi bi-pencil-square"></i> Edit Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCategoryForm">
+                    <input type="hidden" id="editCategoryId">
+                    <div class="mb-3">
+                        <label class="form-label" for="editCatName">Category Name *</label>
+                        <input class="form-control" id="editCatName" type="text" placeholder="e.g., Mountain Bikes" required>
                     </div>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary">Add Product</button>
-                </div>
-            </form>
-
-            <div id="product-list"></div>
-        </div>
-
-        <div class="tab-pane fade" id="orders-tab" role="tabpanel">
-            <div id="admin-orders"></div>
+                    <div class="mb-3">
+                        <label class="form-label" for="editCatDesc">Description</label>
+                        <input class="form-control" id="editCatDesc" type="text" placeholder="Category description">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="editCatImage">Image URL</label>
+                        <input class="form-control" id="editCatImage" type="url" placeholder="https://...">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-admin" onclick="updateCategory()">
+                    <i class="bi bi-save"></i> Update Category
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- ===== EDIT PRODUCT MODAL ===== -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProductModalLabel"><i class="bi bi-pencil-square"></i> Edit Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProductForm">
+                    <input type="hidden" id="editProductId">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="editName">Product Name *</label>
+                            <input class="form-control" id="editName" type="text" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="editPrice">Price *</label>
+                            <input class="form-control" id="editPrice" type="number" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="editStock">Stock *</label>
+                            <input class="form-control" id="editStock" type="number" min="0" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="editCategory">Category *</label>
+                            <select class="form-select" id="editCategory" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="editBikeModel">Bike Model</label>
+                            <input class="form-control" id="editBikeModel" type="text" placeholder="e.g., Trek X-Caliber">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label" for="editDescription">Description</label>
+                            <textarea class="form-control" id="editDescription" rows="3" placeholder="Product description"></textarea>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label" for="editImageUrl">Image URL</label>
+                            <input class="form-control" id="editImageUrl" type="url" placeholder="https://...">
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" id="editFeatured" type="checkbox">
+                                <label class="form-check-label" for="editFeatured">Featured Product</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-admin" onclick="updateProduct()">
+                    <i class="bi bi-save"></i> Update Product
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MAIN LAYOUT ===== -->
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/admin/dashboard">
+                        <i class="bi bi-speedometer2"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#products-tab" onclick="switchTab('products-tab-btn')">
+                        <i class="bi bi-box-seam"></i>
+                        <span class="nav-text">Products</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#categories-tab" onclick="switchTab('categories-tab-btn')">
+                        <i class="bi bi-tags"></i>
+                        <span class="nav-text">Categories</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#orders-tab" onclick="switchTab('orders-tab-btn')">
+                        <i class="bi bi-receipt"></i>
+                        <span class="nav-text">Orders</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 main-content">
+            <h3 class="mb-4"><i class="bi bi-speedometer2"></i> Admin Dashboard</h3>
+
+            <!-- Tabs -->
+            <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-target="#products-tab" data-bs-toggle="tab"
+                            id="products-tab-btn" role="tab" type="button">
+                        <i class="bi bi-box-seam"></i> Products
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-target="#categories-tab" data-bs-toggle="tab"
+                            id="categories-tab-btn" role="tab" type="button">
+                        <i class="bi bi-tags"></i> Categories
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-target="#orders-tab" data-bs-toggle="tab" id="orders-tab-btn"
+                            role="tab" type="button">
+                        <i class="bi bi-receipt"></i> Orders
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Products Tab -->
+                <div class="tab-pane fade show active" id="products-tab" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="bi bi-plus-circle"></i> Add New Product</h5>
+                        </div>
+                        <div class="card-body">
+                            <form class="row g-3 mb-4" id="productForm">
+                                <div class="col-md-4">
+                                    <label class="form-label" for="pName">Product Name *</label>
+                                    <input class="form-control" id="pName" placeholder="e.g., Mountain Bike" required
+                                           type="text">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label" for="pPrice">Price *</label>
+                                    <input class="form-control" id="pPrice" placeholder="0.00" required step="0.01"
+                                           type="number" min="0">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label" for="pStock">Stock *</label>
+                                    <input class="form-control" id="pStock" placeholder="0" required type="number" min="0">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label" for="pCatId">Category *</label>
+                                    <select class="form-select" id="pCatId" required>
+                                        <option value="">Select Category</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label" for="pDesc">Description</label>
+                                    <textarea class="form-control" id="pDesc" placeholder="Product description"
+                                              rows="3"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="pBike">Bike Model</label>
+                                    <input class="form-control" id="pBike" placeholder="e.g., Trek X-Caliber"
+                                           type="text">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="pImage">Image URL</label>
+                                    <input class="form-control" id="pImage" placeholder="https://..." type="url">
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-check mt-4">
+                                        <input class="form-check-input" id="pFeatured" type="checkbox">
+                                        <label class="form-check-label" for="pFeatured">Featured Product</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-10 text-end">
+                                    <button class="btn btn-admin" type="submit"><i class="bi bi-plus"></i> Add Product
+                                    </button>
+                                    <button class="btn btn-outline-secondary" type="reset">Reset</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0"><i class="bi bi-list-ul"></i> Products List</h5>
+                            <!-- CHANGED: Updated refresh button with loading state -->
+                            <button class="btn-refresh" id="refreshProductsBtn" onclick="refreshProducts(this)">
+                                <i class="bi bi-arrow-repeat"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive" id="product-list">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border text-danger" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2 text-muted">Loading products...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Tab -->
+                <div class="tab-pane fade" id="categories-tab" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="bi bi-plus-circle"></i> Add New Category</h5>
+                        </div>
+                        <div class="card-body">
+                            <form class="row g-3 mb-4" id="categoryForm">
+                                <div class="col-md-4">
+                                    <label class="form-label" for="cName">Category Name *</label>
+                                    <input class="form-control" id="cName" placeholder="e.g., Mountain Bikes"
+                                           required type="text">
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label" for="cDesc">Description</label>
+                                    <input class="form-control" id="cDesc" placeholder="Category description"
+                                           type="text">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label" for="cImage">Image URL</label>
+                                    <input class="form-control" id="cImage" placeholder="https://..." type="url">
+                                </div>
+                                <div class="col-md-12 text-end">
+                                    <button class="btn btn-admin" type="submit"><i class="bi bi-plus"></i> Add Category
+                                    </button>
+                                    <button class="btn btn-outline-secondary" type="reset">Reset</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0"><i class="bi bi-list-ul"></i> Categories List</h5>
+                            <!-- CHANGED: Updated refresh button with loading state -->
+                            <button class="btn-refresh" id="refreshCategoriesBtn" onclick="refreshCategories(this)">
+                                <i class="bi bi-arrow-repeat"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive" id="category-list">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border text-danger" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2 text-muted">Loading categories...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Tab -->
+                <div class="tab-pane fade" id="orders-tab" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0"><i class="bi bi-list-ul"></i> Orders</h5>
+                            <!-- CHANGED: Updated refresh button with loading state -->
+                            <button class="btn-refresh" id="refreshOrdersBtn" onclick="refreshOrders(this)">
+                                <i class="bi bi-arrow-repeat"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive" id="admin-orders">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border text-danger" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2 text-muted">Loading orders...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container text-center">
+        <p class="mb-0">© 2026 BOBBY RIDE CUSTOMS. Premium Motorcycle Accessories.</p>
+    </div>
+</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // ===== NAVBAR SCROLL EFFECT =====
+    window.addEventListener('scroll', function() {
+        const navbar = document.getElementById('mainNav');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // ===== LOGOUT =====
     function logout() {
-        fetch('/api/auth/logout', { method: 'POST' })
-            .then(() => window.location.href = '/')
-            .catch(() => window.location.href = '/');
+        if (confirm('Are you sure you want to logout?')) {
+            fetch('/api/auth/logout', { method: 'POST' })
+                .then(() => window.location.href = '/')
+                .catch(() => window.location.href = '/');
+        }
     }
+
+    // ===== TOAST NOTIFICATIONS =====
+    function showToast(message, type = 'success') {
+        const container = document.querySelector('.toast-container');
+        const colors = {
+            success: 'bg-success',
+            error: 'bg-danger',
+            warning: 'bg-warning',
+            info: 'bg-info'
+        };
+
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center ${colors[type] || colors.info} border-0`;
+        toast.role = 'alert';
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        container.appendChild(toast);
+
+        const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+        bsToast.show();
+
+        toast.addEventListener('hidden.bs.toast', () => toast.remove());
+    }
+
+    // ===== SWITCH TAB =====
+    function switchTab(tabId) {
+        const tab = document.getElementById(tabId);
+        if (tab) {
+            const bsTab = new bootstrap.Tab(tab);
+            bsTab.show();
+        }
+    }
+
+    // ===== REFRESH FUNCTIONS WITH LOADING STATE =====
+    // CHANGED: Added refresh functions with button loading state
+    function refreshProducts(btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Loading...';
+        loadProducts();
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Refresh';
+        }, 2000);
+    }
+
+    function refreshCategories(btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Loading...';
+        loadCategoriesList();
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Refresh';
+        }, 2000);
+    }
+
+    function refreshOrders(btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Loading...';
+        loadOrders();
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Refresh';
+        }, 2000);
+    }
+
+    // ============================================================
+    // ===== CATEGORY FUNCTIONS =====
+    // ============================================================
+
+    function loadCategories() {
+        console.log('Loading categories for dropdown...');
+        return fetch('/api/admin/categories')
+            .then(r => {
+                console.log('Categories API response:', r.status);
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return r.json();
+            })
+            .then(data => {
+                const select = document.getElementById('pCatId');
+                select.innerHTML = '<option value="">Select Category</option>';
+                data.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.id;
+                    option.textContent = cat.name;
+                    select.appendChild(option);
+                });
+                return data;
+            })
+            .catch(err => {
+                console.error('Error loading categories:', err);
+                showToast('Failed to load categories', 'error');
+                return [];
+            });
+    }
+
+    function loadEditCategories() {
+        fetch('/api/admin/categories')
+            .then(r => r.json())
+            .then(data => {
+                const select = document.getElementById('editCategory');
+                select.innerHTML = '<option value="">Select Category</option>';
+                data.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.id;
+                    option.textContent = cat.name;
+                    select.appendChild(option);
+                });
+            })
+            .catch(err => console.error('Error loading categories for edit:', err));
+    }
+
+    // CHANGED: Updated with console logging for debugging
+    function loadCategoriesList() {
+        console.log('Loading categories list...');
+        const container = document.getElementById('category-list');
+        container.innerHTML = `
+            <div class="text-center py-3">
+                <div class="spinner-border text-danger" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading categories...</p>
+            </div>
+        `;
+
+        fetch('/api/admin/categories')
+            .then(r => {
+                console.log('Categories API response status:', r.status);
+                if (!r.ok) throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+                return r.json();
+            })
+            .then(data => {
+                console.log('Categories data received:', data.length, 'items');
+                if (!Array.isArray(data) || data.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="bi bi-tags" style="font-size: 3rem; color: var(--text-muted);"></i>
+                            <p class="mt-2 text-muted">No categories found</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const rows = data.map(c => `
+                    <tr>
+                        <td>${c.id || ''}</td>
+                        <td><strong>${c.name || ''}</strong></td>
+                        <td>${c.description || ''}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="openEditCategoryModal(${c.id})" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                container.innerHTML = `
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                    <div class="text-end text-muted small">Showing ${data.length} categories</div>
+                `;
+            })
+            .catch(err => {
+                console.error('Error loading categories:', err);
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i> Unable to load categories: ${err.message}
+                        <button class="btn-refresh ms-2" onclick="refreshCategories(document.getElementById('refreshCategoriesBtn'))">Retry</button>
+                    </div>
+                `;
+                showToast('Failed to load categories: ' + err.message, 'error');
+            });
+    }
+
+    document.getElementById('categoryForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Adding...';
+
+        const payload = {
+            name: document.getElementById('cName').value.trim(),
+            description: document.getElementById('cDesc').value.trim(),
+            imageUrl: document.getElementById('cImage').value.trim()
+        };
+
+        if (!payload.name) {
+            showToast('Category name is required', 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-plus"></i> Add Category';
+            return;
+        }
+
+        fetch('/api/admin/categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) return response.text().then(text => { throw new Error(text) });
+            return response.json();
+        })
+        .then(() => {
+            showToast('Category added successfully!');
+            loadCategoriesList();
+            loadCategories();
+            document.getElementById('categoryForm').reset();
+        })
+        .catch(err => {
+            console.error(err);
+            showToast('Failed to add category: ' + err.message, 'error');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-plus"></i> Add Category';
+        });
+    });
+
+    function openEditCategoryModal(categoryId) {
+        fetch(`/api/admin/categories/${categoryId}`)
+            .then(r => r.json())
+            .then(category => {
+                document.getElementById('editCategoryId').value = category.id;
+                document.getElementById('editCatName').value = category.name || '';
+                document.getElementById('editCatDesc').value = category.description || '';
+                document.getElementById('editCatImage').value = category.imageUrl || '';
+
+                const modal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+                modal.show();
+            })
+            .catch(err => {
+                console.error('Error fetching category:', err);
+                showToast('Failed to load category details', 'error');
+            });
+    }
+
+    function updateCategory() {
+        const id = document.getElementById('editCategoryId').value;
+        const submitBtn = document.querySelector('#editCategoryModal .btn-admin');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Updating...';
+
+        const payload = {
+            name: document.getElementById('editCatName').value.trim(),
+            description: document.getElementById('editCatDesc').value.trim(),
+            imageUrl: document.getElementById('editCatImage').value.trim()
+        };
+
+        if (!payload.name) {
+            showToast('Category name is required', 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-save"></i> Update Category';
+            return;
+        }
+
+        fetch(`/api/admin/categories/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) return response.text().then(text => { throw new Error(text) });
+            return response.json();
+        })
+        .then(() => {
+            showToast('Category updated successfully!');
+            loadCategoriesList();
+            loadCategories();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editCategoryModal'));
+            modal.hide();
+        })
+        .catch(err => {
+            console.error(err);
+            showToast('Failed to update category: ' + err.message, 'error');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-save"></i> Update Category';
+        });
+    }
+
+    function deleteCategory(id) {
+        if (!confirm('Are you sure you want to delete this category? This action cannot be undone.')) return;
+
+        fetch(`/api/admin/categories/${id}`, { method: 'DELETE' })
+            .then(r => {
+                if (r.ok) {
+                    showToast('Category deleted successfully');
+                    loadCategoriesList();
+                    loadCategories();
+                } else {
+                    return r.text().then(text => { throw new Error(text) });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showToast('Failed to delete category: ' + err.message, 'error');
+            });
+    }
+
+    // ============================================================
+    // ===== PRODUCT FUNCTIONS =====
+    // ============================================================
 
     document.getElementById('productForm').addEventListener('submit', function (e) {
         e.preventDefault();
 
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Adding...';
+
         const payload = {
-            name: document.getElementById('pName').value,
+            name: document.getElementById('pName').value.trim(),
             price: Number(document.getElementById('pPrice').value),
             stock: Number(document.getElementById('pStock').value),
             categoryId: Number(document.getElementById('pCatId').value),
-            bikeModel: document.getElementById('pBike').value,
-            description: document.getElementById('pDesc').value,
+            bikeModel: document.getElementById('pBike').value.trim(),
+            imageUrl: document.getElementById('pImage').value.trim(),
+            description: document.getElementById('pDesc').value.trim(),
             featured: document.getElementById('pFeatured').checked
         };
+
+        if (!payload.name || !payload.price || !payload.stock || !payload.categoryId) {
+            showToast('Please fill in all required fields', 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-plus"></i> Add Product';
+            return;
+        }
 
         fetch('/api/admin/products', {
             method: 'POST',
@@ -106,54 +1496,336 @@
             body: JSON.stringify(payload)
         })
         .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) return response.text().then(text => { throw new Error(text) });
             return response.json();
         })
         .then(() => {
-            alert('Product added successfully');
+            showToast('Product added successfully!');
             loadProducts();
             document.getElementById('productForm').reset();
         })
         .catch(err => {
             console.error(err);
-            alert('Failed to add product');
+            showToast('Failed to add product: ' + err.message, 'error');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-plus"></i> Add Product';
         });
     });
 
+    // CHANGED: Updated with console logging for debugging
     function loadProducts() {
+        console.log('Loading products...');
+        const container = document.getElementById('product-list');
+        container.innerHTML = `
+            <div class="text-center py-3">
+                <div class="spinner-border text-danger" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading products...</p>
+            </div>
+        `;
+
         fetch('/api/products?size=50')
             .then(r => {
-                if (!r.ok) throw new Error('Failed to fetch products');
+                console.log('Products API response status:', r.status);
+                if (!r.ok) throw new Error(`HTTP ${r.status}: ${r.statusText}`);
                 return r.json();
             })
             .then(data => {
-                const rows = (data.content || []).map(p => `
-                    <tr>
-                        <td>${p.id ?? ''}</td>
-                        <td>${p.name ?? ''}</td>
-                        <td>${p.price ?? ''}</td>
-                        <td>${p.stock ?? ''}</td>
-                        <td>${p.categoryName ?? ''}</td>
-                    </tr>`).join('');
+                console.log('Products data received:', data);
+                const content = data.content || data;
+                if (!Array.isArray(content) || content.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="bi bi-box-seam" style="font-size: 3rem; color: var(--text-muted);"></i>
+                            <p class="mt-2 text-muted">No products found</p>
+                        </div>
+                    `;
+                    return;
+                }
 
-                const html = `
-                    <table class="table table-sm">
+                const rows = content.map(p => `
+                    <tr>
+                        <td>${p.id || ''}</td>
+                        <td><strong>${p.name || ''}</strong></td>
+                        <td>$${(p.price || 0).toFixed(2)}</td>
+                        <td><span class="badge ${p.stock > 10 ? 'bg-success' : p.stock > 0 ? 'bg-warning' : 'bg-danger'}">${p.stock || '0'}</span></td>
+                        <td>${p.categoryName || p.category?.name || ''}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="openEditProductModal(${p.id})" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                container.innerHTML = `
+                    <table class="table table-sm table-hover">
                         <thead>
-                            <tr><th>ID</th><th>Name</th><th>Price</th><th>Stock</th><th>Category</th></tr>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Category</th>
+                                <th>Actions</th>
+                            </tr>
                         </thead>
                         <tbody>${rows}</tbody>
-                    </table>`;
-
-                document.getElementById('product-list').innerHTML = html;
+                    </table>
+                    <div class="text-end text-muted small">Showing ${content.length} products</div>
+                `;
             })
-            <!--.catch(err => {
-                console.error(err);
-                document.getElementById('product-list').innerHTML = '<div class="text-danger">Unable to load products.</div>';
-            });-->
+            .catch(err => {
+                console.error('Error loading products:', err);
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i> Unable to load products: ${err.message}
+                        <button class="btn-refresh ms-2" onclick="refreshProducts(document.getElementById('refreshProductsBtn'))">Retry</button>
+                    </div>
+                `;
+                showToast('Failed to load products: ' + err.message, 'error');
+            });
     }
 
-    // Initial load
-    loadProducts();
+    function openEditProductModal(productId) {
+        loadEditCategories();
+
+        fetch(`/api/products/${productId}`)
+            .then(r => r.json())
+            .then(product => {
+                document.getElementById('editProductId').value = product.id;
+                document.getElementById('editName').value = product.name || '';
+                document.getElementById('editPrice').value = product.price || '';
+                document.getElementById('editStock').value = product.stock || '';
+                document.getElementById('editBikeModel').value = product.bikeModel || '';
+                document.getElementById('editDescription').value = product.description || '';
+                document.getElementById('editImageUrl').value = product.imageUrl || '';
+                document.getElementById('editFeatured').checked = product.featured || false;
+
+                setTimeout(() => {
+                    const catSelect = document.getElementById('editCategory');
+                    if (product.categoryId) {
+                        catSelect.value = product.categoryId;
+                    }
+                }, 100);
+
+                const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+                modal.show();
+            })
+            .catch(err => {
+                console.error('Error fetching product:', err);
+                showToast('Failed to load product details', 'error');
+            });
+    }
+
+    function updateProduct() {
+        const id = document.getElementById('editProductId').value;
+        const submitBtn = document.querySelector('#editProductModal .btn-admin');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Updating...';
+
+        const payload = {
+            name: document.getElementById('editName').value.trim(),
+            price: Number(document.getElementById('editPrice').value),
+            stock: Number(document.getElementById('editStock').value),
+            categoryId: Number(document.getElementById('editCategory').value),
+            bikeModel: document.getElementById('editBikeModel').value.trim(),
+            imageUrl: document.getElementById('editImageUrl').value.trim(),
+            description: document.getElementById('editDescription').value.trim(),
+            featured: document.getElementById('editFeatured').checked
+        };
+
+        if (!payload.name || !payload.price || !payload.stock || !payload.categoryId) {
+            showToast('Please fill in all required fields', 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-save"></i> Update Product';
+            return;
+        }
+
+        fetch(`/api/admin/products/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) return response.text().then(text => { throw new Error(text) });
+            return response.json();
+        })
+        .then(() => {
+            showToast('Product updated successfully!');
+            loadProducts();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
+            modal.hide();
+        })
+        .catch(err => {
+            console.error(err);
+            showToast('Failed to update product: ' + err.message, 'error');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-save"></i> Update Product';
+        });
+    }
+
+    function deleteProduct(id) {
+        if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) return;
+
+        fetch(`/api/admin/products/${id}`, { method: 'DELETE' })
+            .then(r => {
+                if (r.ok) {
+                    showToast('Product deleted successfully');
+                    loadProducts();
+                } else {
+                    return r.text().then(text => { throw new Error(text) });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showToast('Failed to delete product: ' + err.message, 'error');
+            });
+    }
+
+    // ============================================================
+    // ===== ORDER FUNCTIONS =====
+    // ============================================================
+
+    // CHANGED: Updated with console logging for debugging
+    function loadOrders() {
+        console.log('Loading orders...');
+        const container = document.getElementById('admin-orders');
+        container.innerHTML = `
+            <div class="text-center py-3">
+                <div class="spinner-border text-danger" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading orders...</p>
+            </div>
+        `;
+
+        fetch('/api/admin/orders')
+            .then(r => {
+                console.log('Orders API response status:', r.status);
+                if (!r.ok) throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+                return r.json();
+            })
+            .then(data => {
+                console.log('Orders data received:', data);
+                const orders = Array.isArray(data) ? data : (data.content || data || []);
+
+                if (orders.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="bi bi-receipt" style="font-size: 3rem; color: var(--text-muted);"></i>
+                            <p class="mt-2 text-muted">No orders found</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const rows = orders.map(o => {
+                    const status = o.status || 'PENDING';
+                    const statusClass = `status-${status.toLowerCase()}`;
+                    return `
+                    <tr>
+                        <td>#${o.id}</td>
+                        <td>${o.userEmail || o.user?.email || 'N/A'}</td>
+                        <td>
+                            <div class="status-wrapper">
+                                <span class="status-badge ${statusClass}">${status}</span>
+                                <select class="status-dropdown" onchange="updateOrderStatus(${o.id}, this.value)"
+                                        data-current-status="${status}">
+                                    <option value="PENDING" ${status === 'PENDING' ? 'selected' : ''}>PENDING</option>
+                                    <option value="CONFIRMED" ${status === 'CONFIRMED' ? 'selected' : ''}>CONFIRMED</option>
+                                    <option value="PROCESSING" ${status === 'PROCESSING' ? 'selected' : ''}>PROCESSING</option>
+                                    <option value="SHIPPED" ${status === 'SHIPPED' ? 'selected' : ''}>SHIPPED</option>
+                                    <option value="DELIVERED" ${status === 'DELIVERED' ? 'selected' : ''}>DELIVERED</option>
+                                    <option value="CANCELLED" ${status === 'CANCELLED' ? 'selected' : ''}>CANCELLED</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>$${(o.totalAmount || o.total || 0).toFixed(2)}</td>
+                        <td>${o.createdAt ? new Date(o.createdAt).toLocaleString() : 'N/A'}</td>
+                    </tr>
+                `}).join('');
+
+                container.innerHTML = `
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>User</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                    <div class="text-end text-muted small">Showing ${orders.length} orders</div>
+                `;
+            })
+            .catch(err => {
+                console.error('Error loading orders:', err);
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i> Unable to load orders: ${err.message}
+                        <button class="btn-refresh ms-2" onclick="refreshOrders(document.getElementById('refreshOrdersBtn'))">Retry</button>
+                    </div>
+                `;
+                showToast('Unable to load orders: ' + err.message, 'error');
+            });
+    }
+
+    // ===== UPDATE ORDER STATUS =====
+    function updateOrderStatus(orderId, newStatus) {
+        const row = document.querySelector(`.status-dropdown[onchange*="${orderId}"]`);
+        const badge = row ? row.closest('tr').querySelector('.status-badge') : null;
+        const originalStatus = row ? row.dataset.currentStatus : null;
+
+        fetch(`/api/admin/orders/${orderId}/status?status=${newStatus}`, {
+            method: 'PUT'
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text) });
+            }
+            return response.json();
+        })
+        .then(() => {
+            showToast(`Order #${orderId} status updated to ${newStatus}`, 'success');
+            if (row) {
+                row.dataset.currentStatus = newStatus;
+            }
+            if (badge) {
+                badge.className = `status-badge status-${newStatus.toLowerCase()}`;
+                badge.textContent = newStatus;
+            }
+        })
+        .catch(err => {
+            console.error('Error updating order status:', err);
+            showToast(`Failed to update order status: ${err.message}`, 'error');
+            if (row) {
+                row.value = originalStatus || 'PENDING';
+            }
+        });
+    }
+
+    // ============================================================
+    // ===== INITIAL LOAD =====
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Dashboard loaded, initializing data...');
+        loadProducts();
+        loadCategoriesList();
+        loadCategories();
+        loadOrders();
+    });
 </script>
 </body>
 </html>

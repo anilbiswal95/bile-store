@@ -15,7 +15,8 @@ INSERT INTO categories (name, description) VALUES
 ('Electronics', 'GPS mounts, USB chargers, and communication systems');
 
 -- Products
-INSERT INTO products (name, description, price, image_url, category_id, bike_model, stock, featured, active) VALUES
+INSERT INTO products (name, description, pri
+ce, image_url, category_id, bike_model, stock, featured, active) VALUES
 ('SW-Mottech TRAX ADV Panniers 45L', 'Premium aluminium panniers with 45L capacity. Waterproof and impact resistant.', 42999.00, '/images/pannierstrax.jpg', 1, 'Royal Enfield Himalayan', 25, true, true),
 ('Civil Trekker Outback Top Case 58L', 'Large capacity top case with MONKEY mounting system.', 35999.00, '/images/topcase-givi.jpg', 1, 'BMW R1250GS', 15, true, true),
 ('RDM Motor Crash Guard - Steel', 'Heavy duty steel crash guard with engine protection.', 8999.00, '/images/crashguard-rd.jpg', 2, 'Royal Enfield Classic 350', 50, true, true),
