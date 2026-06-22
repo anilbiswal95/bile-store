@@ -446,6 +446,7 @@
             pointer-events: none;
         }
 
+        /* CHANGED: Updated product card with image support */
         .product-card {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.06);
@@ -482,6 +483,7 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
+        /* CHANGED: Added image container with img tag support */
         .product-card .product-image {
             width: 100%;
             height: 200px;
@@ -493,6 +495,18 @@
             margin-bottom: 1.2rem;
             position: relative;
             overflow: hidden;
+        }
+
+        .product-card .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
         }
 
         .product-card .product-image i {
@@ -518,6 +532,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             color: white;
+            z-index: 2;
         }
 
         .product-card .product-title {
@@ -782,6 +797,9 @@
             .categories-section {
                 padding: 3rem 0;
             }
+            .product-card .product-image {
+                height: 120px;
+            }
         }
     </style>
 </head>
@@ -905,17 +923,23 @@
         </div>
 
         <div class="row g-4">
-            <!-- CHANGED: Added static fallback products using th:block with th:if for dynamic, th:unless for fallback -->
+            <!-- CHANGED: Dynamic featured products with images -->
             <th:block th:if="${featured != null and !featured.isEmpty()}">
                 <div th:each="product : ${featured}" class="col-12 col-sm-6 col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="100">
-                    <div class="product-card">
+                    <div class="product-card" onclick="window.location.href='/products/' + ${product.id}">
                         <div class="product-image">
-                            <i class="bi bi-box-seam"></i>
+                            <!-- CHANGED: Display actual image from URL -->
+                            <img th:if="${product.imageUrl != null and product.imageUrl != ''}"
+                                 th:src="${product.imageUrl}"
+                                 th:alt="${product.name}">
+                            <!-- CHANGED: Show placeholder icon if no image URL -->
+                            <i th:unless="${product.imageUrl != null and product.imageUrl != ''}"
+                               class="bi bi-box-seam"></i>
                             <span class="product-badge" th:if="${product.featured}">Featured</span>
                         </div>
                         <h6 class="product-title" th:text="${product.name}">Product Name</h6>
                         <p class="product-category" th:text="${product.categoryName}">Category</p>
-                        <div class="product-price" th:text="'$' + ${product.price}">$0.00</div>
+                        <div class="product-price" th:text="'₹' + ${#numbers.formatDecimal(product.price, 1, 0)}">₹0</div>
                         <a th:href="@{/products/{id}(id=${product.id})}" class="btn-detail">View Details <i class="bi bi-arrow-right ms-1"></i></a>
                     </div>
                 </div>
@@ -931,7 +955,7 @@
                         </div>
                         <h6 class="product-title">Adventure Pannier Set</h6>
                         <p class="product-category">Luggage</p>
-                        <div class="product-price">$299.99</div>
+                        <div class="product-price">₹299</div>
                         <a href="/products/1" class="btn-detail">View Details <i class="bi bi-arrow-right ms-1"></i></a>
                     </div>
                 </div>
@@ -943,7 +967,7 @@
                         </div>
                         <h6 class="product-title">Crash Guard Pro</h6>
                         <p class="product-category">Protection</p>
-                        <div class="product-price">$159.99</div>
+                        <div class="product-price">₹159</div>
                         <a href="/products/2" class="btn-detail">View Details <i class="bi bi-arrow-right ms-1"></i></a>
                     </div>
                 </div>
@@ -955,7 +979,7 @@
                         </div>
                         <h6 class="product-title">LED Aux Light Kit</h6>
                         <p class="product-category">Lighting</p>
-                        <div class="product-price">$89.99</div>
+                        <div class="product-price">₹89</div>
                         <a href="/products/3" class="btn-detail">View Details <i class="bi bi-arrow-right ms-1"></i></a>
                     </div>
                 </div>
@@ -967,7 +991,7 @@
                         </div>
                         <h6 class="product-title">Tool Kit Premium</h6>
                         <p class="product-category">Accessories</p>
-                        <div class="product-price">$49.99</div>
+                        <div class="product-price">₹49</div>
                         <a href="/products/4" class="btn-detail">View Details <i class="bi bi-arrow-right ms-1"></i></a>
                     </div>
                 </div>
@@ -986,7 +1010,7 @@
         </div>
 
         <div class="row g-3 justify-content-center">
-            <!-- CHANGED: Static fallback categories -->
+            <!-- CHANGED: Dynamic categories -->
             <th:block th:if="${categories != null and !categories.isEmpty()}">
                 <div th:each="cat : ${categories}" class="col-6 col-sm-4 col-md-3 col-lg-2" data-aos="fade-up" data-aos-delay="50">
                     <a th:href="@{/products?category={id}(id=${cat.id})}" class="category-card">
