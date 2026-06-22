@@ -10,10 +10,23 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-    <!-- Modern Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --primary: #e63946;
+            --primary-dark: #c62835;
+            --primary-light: #ff6b7a;
+            --dark: #0a0a0a;
+            --dark-gray: #1a1a1a;
+            --text-light: #ffffff;
+            --text-muted: #b0b0b0;
+            --gradient-primary: linear-gradient(135deg, #e63946 0%, #c62835 100%);
+            --border-radius: 16px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -21,78 +34,168 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f5f5f5;
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: var(--text-light);
+            overflow-x: hidden;
         }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--gradient-primary); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
 
         /* ===== NAVBAR ===== */
         .navbar {
-            font-family: 'Poppins', sans-serif;
-            background-color: #2c3e50 !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 0.5rem 0;
+            font-family: 'Inter', sans-serif;
+            background: rgba(10, 10, 10, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0.8rem 0;
+            transition: var(--transition);
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.98) !important;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
         }
 
         .navbar-brand {
             display: flex;
             align-items: center;
             gap: 12px;
+            text-decoration: none;
         }
 
         .navbar-brand img {
-            height: 48px;
-            background-color: transparent;
-            border-radius: 0;
-            object-fit: contain;
+            height: 52px;
+            border-radius: 12px;
+            transition: var(--transition);
         }
 
-        .navbar-brand span {
-            font-weight: 600;
-            font-size: 1.3rem;
-            color: #f8f9fa;
-            letter-spacing: 0.5px;
+        .navbar-brand img:hover {
+            transform: scale(1.05) rotate(-3deg);
+        }
+
+        .navbar-brand .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .navbar-brand .brand-main {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-brand .brand-sub {
+            font-size: 0.55rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            -webkit-text-fill-color: var(--text-muted);
         }
 
         .navbar .nav-link {
             font-weight: 500;
-            font-size: 1.05rem;
-            color: #f8f9fa !important;
-            transition: color 0.25s ease, transform 0.25s ease;
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.7) !important;
+            transition: var(--transition);
+            padding: 0.5rem 1rem !important;
+            position: relative;
+        }
+
+        .navbar .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: var(--transition);
+            transform: translateX(-50%);
+        }
+
+        .navbar .nav-link:hover::after,
+        .navbar .nav-link.active::after {
+            width: 60%;
         }
 
         .navbar .nav-link:hover {
-            color: #e63946 !important;
-            transform: translateY(-2px);
+            color: var(--text-light) !important;
+        }
+
+        .navbar .nav-link i {
+            margin-right: 6px;
+        }
+
+        .dropdown-menu {
+            background: var(--dark-gray);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .dropdown-menu .dropdown-item {
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .dropdown-menu .dropdown-item:hover {
+            background: rgba(230, 57, 70, 0.1);
+            color: var(--text-light);
+        }
+
+        .dropdown-menu .dropdown-divider {
+            border-color: rgba(255,255,255,0.05);
         }
 
         /* ===== SIDEBAR ===== */
         .sidebar {
-            background-color: #2c3e50;
-            min-height: calc(100vh - 72px);
+            background: rgba(255,255,255,0.03);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            min-height: calc(100vh - 76px);
             padding: 20px 0;
             position: sticky;
-            top: 72px;
+            top: 76px;
+            backdrop-filter: blur(10px);
         }
 
         .sidebar .nav-link {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.6);
             padding: 12px 20px;
-            border-left: 4px solid transparent;
-            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            transition: var(--transition);
             font-weight: 500;
+            font-size: 0.95rem;
+            border-radius: 0;
         }
 
         .sidebar .nav-link:hover,
         .sidebar .nav-link.active {
-            background-color: rgba(255,255,255,0.08);
-            border-left-color: #e63946;
-            color: #ffffff;
+            background: rgba(230, 57, 70, 0.08);
+            border-left-color: var(--primary);
+            color: var(--text-light);
         }
 
         .sidebar .nav-link i {
             width: 24px;
             text-align: center;
-            margin-right: 8px;
+            margin-right: 10px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .sidebar .nav-link:hover i,
+        .sidebar .nav-link.active i {
+            color: var(--primary-light);
         }
 
         /* ===== MAIN CONTENT ===== */
@@ -100,79 +203,265 @@
             padding: 30px;
         }
 
+        .main-content h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #e63946 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== CARDS ===== */
         .card {
-            border: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--border-radius);
             margin-bottom: 20px;
-            transition: box-shadow 0.3s ease;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
         }
 
         .card:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            border-color: rgba(230, 57, 70, 0.2);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.3);
         }
 
         .card-header {
-            background-color: #f8f9fa;
-            border-bottom: 2px solid #e63946;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 2px solid rgba(230, 57, 70, 0.3);
             font-weight: 600;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+            color: var(--text-light);
         }
 
+        .card-header .card-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-label {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .form-control,
+        .form-select {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-light);
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.15);
+            color: var(--text-light);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .form-select option {
+            background: var(--dark);
+            color: var(--text-light);
+        }
+
+        .form-check-label {
+            color: var(--text-muted);
+        }
+
+        .form-check-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* ===== BUTTONS ===== */
         .btn-admin {
-            background-color: #e63946;
-            border-color: #e63946;
+            background: var(--gradient-primary);
+            border: none;
             color: white;
-            transition: all 0.25s ease;
+            padding: 0.6rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.2);
         }
 
         .btn-admin:hover {
-            background-color: #c62835;
-            border-color: #c62835;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(230, 57, 70, 0.4);
             color: white;
+        }
+
+        .btn-admin-sm {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .btn-admin-sm:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.35);
+            box-shadow: 0 4px 20px rgba(230, 57, 70, 0.3);
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            padding: 0.6rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: var(--transition);
         }
 
         .btn-outline-secondary:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--primary);
+            color: var(--text-light);
+            transform: translateY(-3px);
+        }
+
+        .btn-warning {
+            background: rgba(255, 193, 7, 0.15);
+            border: 1px solid rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border-radius: 50px;
+            padding: 0.3rem 0.8rem;
+            transition: var(--transition);
+        }
+
+        .btn-warning:hover {
+            background: rgba(255, 193, 7, 0.25);
+            color: #ffc107;
             transform: translateY(-2px);
         }
 
-        .btn-warning:hover,
+        .btn-danger {
+            background: rgba(230, 57, 70, 0.15);
+            border: 1px solid rgba(230, 57, 70, 0.2);
+            color: var(--primary-light);
+            border-radius: 50px;
+            padding: 0.3rem 0.8rem;
+            transition: var(--transition);
+        }
+
         .btn-danger:hover {
+            background: rgba(230, 57, 70, 0.25);
+            color: var(--primary-light);
             transform: translateY(-2px);
         }
 
         /* ===== TAB STYLING ===== */
+        .nav-tabs {
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
         .nav-tabs .nav-link {
-            color: #2c3e50;
+            color: var(--text-muted);
             font-weight: 500;
             border: none;
             border-bottom: 3px solid transparent;
-            transition: all 0.25s ease;
+            transition: var(--transition);
+            padding: 0.8rem 1.5rem;
+            background: transparent;
         }
 
         .nav-tabs .nav-link:hover {
-            border-bottom-color: #e63946;
-            color: #e63946;
+            border-bottom-color: var(--primary);
+            color: var(--text-light);
         }
 
         .nav-tabs .nav-link.active {
-            color: #e63946;
-            border-bottom-color: #e63946;
-            background-color: transparent;
+            color: var(--primary-light);
+            border-bottom-color: var(--primary);
+            background: transparent;
+        }
+
+        .nav-tabs .nav-link i {
+            margin-right: 6px;
         }
 
         /* ===== TABLE STYLING ===== */
-        .table thead {
-            background-color: #2c3e50;
-            color: white;
+        .table {
+            color: var(--text-light);
+            margin-bottom: 0;
         }
 
-        .table-hover tbody tr:hover {
-            background-color: rgba(230, 57, 70, 0.05);
+        .table thead {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .table thead th {
+            border-bottom: 2px solid rgba(255,255,255,0.06);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.8rem 0.5rem;
         }
 
         .table td {
+            border-color: rgba(255,255,255,0.05);
             vertical-align: middle;
+            padding: 0.8rem 0.5rem;
+        }
+
+        .table-hover tbody tr:hover {
+            background: rgba(230, 57, 70, 0.05);
+        }
+
+        .table .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+
+        .table .badge.bg-success {
+            background: rgba(40, 167, 69, 0.15) !important;
+            color: #28a745;
+        }
+
+        .table .badge.bg-warning {
+            background: rgba(255, 193, 7, 0.15) !important;
+            color: #ffc107;
+        }
+
+        .table .badge.bg-danger {
+            background: rgba(230, 57, 70, 0.15) !important;
+            color: var(--primary-light);
+        }
+
+        .table .badge.bg-secondary {
+            background: rgba(255,255,255,0.05) !important;
+            color: var(--text-muted);
         }
 
         /* ===== TOAST NOTIFICATION ===== */
@@ -183,6 +472,48 @@
             z-index: 9999;
         }
 
+        .toast {
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+        }
+
+        .toast .toast-body {
+            color: var(--text-light);
+        }
+
+        .toast.bg-success .toast-body {
+            color: #28a745;
+        }
+
+        .toast.bg-danger .toast-body {
+            color: var(--primary-light);
+        }
+
+        .toast.bg-warning .toast-body {
+            color: #ffc107;
+        }
+
+        .toast.bg-info .toast-body {
+            color: #0dcaf0;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: rgba(0,0,0,0.9);
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 2rem;
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 300;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .sidebar {
@@ -190,20 +521,46 @@
                 position: relative;
                 top: 0;
                 margin-bottom: 20px;
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
             }
             .main-content {
                 padding: 15px;
             }
-            .navbar-brand span {
-                font-size: 1rem;
+            .navbar-brand .brand-main {
+                font-size: 0.9rem;
+            }
+            .navbar-brand .brand-sub {
+                font-size: 0.45rem;
             }
             .navbar-brand img {
-                height: 36px;
+                height: 40px;
             }
             .toast-container {
                 top: 70px;
                 right: 10px;
                 left: 10px;
+            }
+            .main-content h3 {
+                font-size: 1.4rem;
+            }
+            .table {
+                font-size: 0.85rem;
+            }
+            .btn-admin,
+            .btn-outline-secondary {
+                padding: 0.5rem 1.2rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 1rem;
+            }
+            .nav-tabs .nav-link {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -211,14 +568,17 @@
 <body>
 
 <!-- ===== NAVBAR ===== -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
     <div class="container-fluid px-4">
         <a class="navbar-brand" href="/">
             <img alt="BOBBY RIDE CUSTOMS Logo" src="/images/logo.jpg">
-            <span>BOBBY RIDE CUSTOMS</span>
+            <div class="brand-text">
+                <span class="brand-main">BOBBY RIDE</span>
+                <span class="brand-sub">CUSTOMS</span>
+            </div>
         </a>
 
-        <button class="navbar-toggler" data-bs-target="#adminNavbar" data-bs-toggle="collapse" type="button">
+        <button class="navbar-toggler border-0" data-bs-target="#adminNavbar" data-bs-toggle="collapse" type="button">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -358,7 +718,7 @@
                     <div class="card mt-4">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0"><i class="bi bi-list-ul"></i> Products List</h5>
-                            <button class="btn btn-sm btn-admin" onclick="loadProducts()">
+                            <button class="btn btn-admin-sm" onclick="loadProducts()">
                                 <i class="bi bi-arrow-repeat"></i> Refresh
                             </button>
                         </div>
@@ -368,7 +728,7 @@
                                     <div class="spinner-border text-danger" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>
-                                    <p class="mt-2">Loading products...</p>
+                                    <p class="mt-2 text-muted">Loading products...</p>
                                 </div>
                             </div>
                         </div>
@@ -409,7 +769,7 @@
                     <div class="card mt-4">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0"><i class="bi bi-list-ul"></i> Categories List</h5>
-                            <button class="btn btn-sm btn-admin" onclick="loadCategoriesList()">
+                            <button class="btn btn-admin-sm" onclick="loadCategoriesList()">
                                 <i class="bi bi-arrow-repeat"></i> Refresh
                             </button>
                         </div>
@@ -419,7 +779,7 @@
                                     <div class="spinner-border text-danger" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>
-                                    <p class="mt-2">Loading categories...</p>
+                                    <p class="mt-2 text-muted">Loading categories...</p>
                                 </div>
                             </div>
                         </div>
@@ -431,7 +791,7 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0"><i class="bi bi-list-ul"></i> Orders</h5>
-                            <button class="btn btn-sm btn-admin" onclick="loadOrders()">
+                            <button class="btn btn-admin-sm" onclick="loadOrders()">
                                 <i class="bi bi-arrow-repeat"></i> Refresh
                             </button>
                         </div>
@@ -441,7 +801,7 @@
                                     <div class="spinner-border text-danger" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>
-                                    <p class="mt-2">Loading orders...</p>
+                                    <p class="mt-2 text-muted">Loading orders...</p>
                                 </div>
                             </div>
                         </div>
@@ -453,14 +813,24 @@
 </div>
 
 <!-- Footer -->
-<footer class="bg-dark text-light py-3 mt-4">
+<footer class="footer">
     <div class="container text-center">
-        <p class="mb-0 small">© 2026 BOBBY RIDE CUSTOMS. Premium Motorcycle Accessories.</p>
+        <p class="mb-0">© 2026 BOBBY RIDE CUSTOMS. Premium Motorcycle Accessories.</p>
     </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // ===== NAVBAR SCROLL EFFECT =====
+    window.addEventListener('scroll', function() {
+        const navbar = document.getElementById('mainNav');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
     // ===== LOGOUT =====
     function logout() {
         if (confirm('Are you sure you want to logout?')) {
@@ -474,10 +844,10 @@
     function showToast(message, type = 'success') {
         const container = document.querySelector('.toast-container');
         const colors = {
-            success: 'bg-success text-white',
-            error: 'bg-danger text-white',
-            warning: 'bg-warning text-dark',
-            info: 'bg-info text-white'
+            success: 'bg-success',
+            error: 'bg-danger',
+            warning: 'bg-warning',
+            info: 'bg-info'
         };
 
         const toast = document.createElement('div');
@@ -633,7 +1003,7 @@
                 <div class="spinner-border text-danger" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <p class="mt-2">Loading products...</p>
+                <p class="mt-2 text-muted">Loading products...</p>
             </div>
         `;
 
@@ -643,9 +1013,9 @@
                 const content = data.content || data;
                 if (!Array.isArray(content) || content.length === 0) {
                     container.innerHTML = `
-                        <div class="text-center py-4 text-muted">
-                            <i class="bi bi-box-seam" style="font-size: 3rem;"></i>
-                            <p class="mt-2">No products found</p>
+                        <div class="text-center py-4">
+                            <i class="bi bi-box-seam" style="font-size: 3rem; color: var(--text-muted);"></i>
+                            <p class="mt-2 text-muted">No products found</p>
                         </div>
                     `;
                     return;
@@ -659,10 +1029,10 @@
                         <td><span class="badge ${p.stock > 10 ? 'bg-success' : p.stock > 0 ? 'bg-warning' : 'bg-danger'}">${p.stock || '0'}</span></td>
                         <td>${p.categoryName || p.category?.name || ''}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" onclick="editProduct(${p.id})" title="Edit">
+                            <button class="btn btn-warning btn-sm" onclick="editProduct(${p.id})" title="Edit">
                                 <i class="bi bi-pencil"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})" title="Delete">
+                            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})" title="Delete">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -691,7 +1061,7 @@
                 container.innerHTML = `
                     <div class="alert alert-danger">
                         <i class="bi bi-exclamation-triangle"></i> Unable to load products: ${err.message}
-                        <button class="btn btn-sm btn-outline-danger ms-2" onclick="loadProducts()">Retry</button>
+                        <button class="btn btn-admin-sm ms-2" onclick="loadProducts()">Retry</button>
                     </div>
                 `;
             });
@@ -705,7 +1075,7 @@
                 <div class="spinner-border text-danger" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <p class="mt-2">Loading categories...</p>
+                <p class="mt-2 text-muted">Loading categories...</p>
             </div>
         `;
 
@@ -714,9 +1084,9 @@
             .then(data => {
                 if (!Array.isArray(data) || data.length === 0) {
                     container.innerHTML = `
-                        <div class="text-center py-4 text-muted">
-                            <i class="bi bi-tags" style="font-size: 3rem;"></i>
-                            <p class="mt-2">No categories found</p>
+                        <div class="text-center py-4">
+                            <i class="bi bi-tags" style="font-size: 3rem; color: var(--text-muted);"></i>
+                            <p class="mt-2 text-muted">No categories found</p>
                         </div>
                     `;
                     return;
@@ -728,10 +1098,10 @@
                         <td><strong>${c.name || ''}</strong></td>
                         <td>${c.description || ''}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" onclick="editCategory(${c.id})" title="Edit">
+                            <button class="btn btn-warning btn-sm" onclick="editCategory(${c.id})" title="Edit">
                                 <i class="bi bi-pencil"></i>
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteCategory(${c.id})" title="Delete">
+                            <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})" title="Delete">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -758,7 +1128,7 @@
                 container.innerHTML = `
                     <div class="alert alert-danger">
                         <i class="bi bi-exclamation-triangle"></i> Unable to load categories: ${err.message}
-                        <button class="btn btn-sm btn-outline-danger ms-2" onclick="loadCategoriesList()">Retry</button>
+                        <button class="btn btn-admin-sm ms-2" onclick="loadCategoriesList()">Retry</button>
                     </div>
                 `;
             });
@@ -772,7 +1142,7 @@
                 <div class="spinner-border text-danger" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <p class="mt-2">Loading orders...</p>
+                <p class="mt-2 text-muted">Loading orders...</p>
             </div>
         `;
 
@@ -782,14 +1152,13 @@
                 return r.json();
             })
             .then(data => {
-                // Handle both array and paginated responses
                 const orders = Array.isArray(data) ? data : (data.content || data || []);
 
                 if (orders.length === 0) {
                     container.innerHTML = `
-                        <div class="text-center py-4 text-muted">
-                            <i class="bi bi-receipt" style="font-size: 3rem;"></i>
-                            <p class="mt-2">No orders found</p>
+                        <div class="text-center py-4">
+                            <i class="bi bi-receipt" style="font-size: 3rem; color: var(--text-muted);"></i>
+                            <p class="mt-2 text-muted">No orders found</p>
                         </div>
                     `;
                     return;
@@ -830,10 +1199,9 @@
                 container.innerHTML = `
                     <div class="alert alert-danger">
                         <i class="bi bi-exclamation-triangle"></i> Unable to load orders: ${err.message}
-                        <button class="btn btn-sm btn-outline-danger ms-2" onclick="loadOrders()">Retry</button>
+                        <button class="btn btn-admin-sm ms-2" onclick="loadOrders()">Retry</button>
                     </div>
                 `;
-                // Show a more user-friendly message as seen in the image
                 showToast('Unable to load orders. Please try again.', 'error');
             });
     }
