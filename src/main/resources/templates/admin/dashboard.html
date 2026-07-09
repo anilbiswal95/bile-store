@@ -13,6 +13,11 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- ===== IMPORT FRAGMENT STYLES ===== -->
+    <th:block th:replace="~{fragments/navbar :: navbar-styles}" />
+    <th:block th:replace="~{fragments/brand :: brand-styles}" />
+    <th:block th:replace="~{fragments/footer :: footer-styles}" />
+
     <style>
         :root {
             --primary: #e63946;
@@ -771,36 +776,8 @@
 <body>
 
 <!-- ===== NAVBAR ===== -->
-<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
-    <div class="container-fluid px-4">
-        <a class="navbar-brand" href="/">
-            <img alt="BOBBY RIDE CUSTOMS Logo" src="/images/logo.jpg">
-            <div class="brand-text">
-                <span class="brand-main">BOBBY RIDE</span>
-                <span class="brand-sub">CUSTOMS</span>
-            </div>
-        </a>
-
-        <button class="navbar-toggler border-0" data-bs-target="#adminNavbar" data-bs-toggle="collapse" type="button">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="adminNavbar">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <span class="nav-link" sec:authentication="principal.fullName">
-                        <i class="bi bi-person-circle"></i> <span sec:authentication="principal.fullName"></span>
-                    </span>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="logout()">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<!-- ===== REPLACE NAVBAR ===== -->
+<th:block th:replace="~{fragments/navbar :: navbar(activePage='home')}" />
 
 <!-- ===== TOAST CONTAINER ===== -->
 <div class="toast-container"></div>
@@ -1119,11 +1096,8 @@
 </div>
 
 <!-- Footer -->
-<footer class="footer">
-    <div class="container text-center">
-        <p class="mb-0">© 2026 BOBBY RIDE CUSTOMS. Premium Motorcycle Accessories.</p>
-    </div>
-</footer>
+<!-- ===== REPLACE FOOTER ===== -->
+<th:block th:replace="~{fragments/footer :: footer}" />
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>

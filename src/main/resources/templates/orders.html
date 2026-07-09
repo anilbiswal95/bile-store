@@ -13,6 +13,11 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- ===== IMPORT FRAGMENT STYLES ===== -->
+    <th:block th:replace="~{fragments/navbar :: navbar-styles}" />
+    <th:block th:replace="~{fragments/brand :: brand-styles}" />
+    <th:block th:replace="~{fragments/footer :: footer-styles}" />
+
     <style>
         :root {
             --primary: #e63946;
@@ -25,6 +30,7 @@
             --gradient-primary: linear-gradient(135deg, #e63946 0%, #c62835 100%);
             --border-radius: 16px;
             --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --navbar-height: 80px;
         }
 
         body {
@@ -32,139 +38,23 @@
             background: var(--dark);
             color: var(--text-light);
             overflow-x: hidden;
+            padding-top: var(--navbar-height);
         }
 
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: var(--dark); }
         ::-webkit-scrollbar-thumb { background: var(--gradient-primary); border-radius: 10px; }
 
-        /* ===== NAVBAR ===== */
-        .navbar {
-            font-family: 'Inter', sans-serif;
-            background: rgba(10, 10, 10, 0.95) !important;
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding: 0.8rem 0;
+        /* ===== PAGE HEADER - FIXED ALIGNMENT ===== */
+        .page-wrapper {
+            padding-top: 0;
         }
 
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .navbar-brand img {
-            height: 52px;
-            border-radius: 12px;
-            transition: var(--transition);
-        }
-
-        .navbar-brand img:hover {
-            transform: scale(1.05) rotate(-3deg);
-        }
-
-        .navbar-brand .brand-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-        }
-
-        .navbar-brand .brand-main {
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
-            font-size: 1.1rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .navbar-brand .brand-sub {
-            font-size: 0.55rem;
-            font-weight: 300;
-            letter-spacing: 3px;
-            color: var(--text-muted);
-            -webkit-text-fill-color: var(--text-muted);
-        }
-
-        .navbar-nav .nav-link {
-            font-weight: 500;
-            font-size: 0.95rem;
-            color: rgba(255,255,255,0.7) !important;
-            transition: var(--transition);
-            padding: 0.5rem 1rem !important;
-            position: relative;
-        }
-
-        .navbar-nav .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: var(--gradient-primary);
-            transition: var(--transition);
-            transform: translateX(-50%);
-        }
-
-        .navbar-nav .nav-link:hover::after,
-        .navbar-nav .nav-link.active::after {
-            width: 60%;
-        }
-
-        .navbar-nav .nav-link:hover {
-            color: var(--text-light) !important;
-        }
-
-        .navbar-nav .nav-link i {
-            margin-right: 6px;
-        }
-
-        .navbar-search .form-control {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-light);
-            border-radius: 50px;
-            padding: 0.6rem 1.2rem;
-            font-size: 0.9rem;
-            transition: var(--transition);
-            min-width: 250px;
-        }
-
-        .navbar-search .form-control:focus {
-            background: rgba(255,255,255,0.12);
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.15);
-        }
-
-        .navbar-search .form-control::placeholder {
-            color: rgba(255,255,255,0.4);
-        }
-
-        .navbar-search .btn-outline-light {
-            border-radius: 50px;
-            padding: 0.6rem 1.2rem;
-            border-color: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.7);
-            transition: var(--transition);
-        }
-
-        .navbar-search .btn-outline-light:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        /* ===== PAGE HEADER ===== */
         .page-header {
             padding: 30px 0 20px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             margin-bottom: 2rem;
-            margin-top: 20px;
+            margin-top: 0;
         }
 
         .page-header h2 {
@@ -175,11 +65,14 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            margin-bottom: 0.5rem;
         }
 
         .page-header p {
             color: var(--text-muted);
             font-weight: 300;
+            font-size: 1rem;
+            margin-bottom: 0;
         }
 
         /* ===== ORDERS TABLE ===== */
@@ -204,6 +97,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             padding: 1rem 0.5rem;
+            white-space: nowrap;
         }
 
         .table td {
@@ -212,23 +106,35 @@
             padding: 1rem 0.5rem;
         }
 
+        .table tbody tr {
+            transition: var(--transition);
+        }
+
+        .table tbody tr:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
         .order-status {
             padding: 4px 14px;
             border-radius: 50px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             display: inline-block;
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .status-pending { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
         .status-confirmed { background: rgba(40, 167, 69, 0.15); color: #28a745; }
         .status-shipped { background: rgba(13, 110, 253, 0.15); color: #0d6efd; }
+        .status-delivered { background: rgba(40, 167, 69, 0.15); color: #28a745; }
         .status-cancelled { background: rgba(230, 57, 70, 0.15); color: var(--primary-light); }
 
         .btn-outline-primary-custom {
             background: transparent;
             border: 1px solid rgba(255,255,255,0.1);
-            color: var(--primary);
+            color: var(--primary-light);
             padding: 0.3rem 1.2rem;
             border-radius: 50px;
             font-weight: 500;
@@ -236,6 +142,7 @@
             transition: var(--transition);
             text-decoration: none;
             display: inline-block;
+            white-space: nowrap;
         }
 
         .btn-outline-primary-custom:hover {
@@ -243,41 +150,102 @@
             border-color: var(--primary);
             color: white;
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(230, 57, 70, 0.2);
         }
 
-        /* ===== FOOTER ===== */
-        .footer {
-            background: rgba(0,0,0,0.9);
-            padding: 3rem 0;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            margin-top: 3rem;
+        .text-primary-light {
+            color: var(--primary-light);
+            text-decoration: none;
         }
 
-        .footer p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-weight: 300;
+        .text-primary-light:hover {
+            color: var(--primary);
+            text-decoration: underline;
         }
 
         /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            :root {
+                --navbar-height: 72px;
+            }
+        }
+
         @media (max-width: 768px) {
-            .navbar-brand .brand-main {
-                font-size: 0.9rem;
+            :root {
+                --navbar-height: 64px;
             }
-            .navbar-brand .brand-sub {
-                font-size: 0.45rem;
+            body {
+                padding-top: var(--navbar-height);
             }
-            .navbar-search .form-control {
-                min-width: auto;
+            .page-header {
+                padding: 20px 0 15px;
             }
             .page-header h2 {
                 font-size: 1.5rem;
             }
+            .page-header p {
+                font-size: 0.9rem;
+            }
             .orders-card {
                 padding: 1rem;
+                overflow-x: auto;
             }
             .table {
-                font-size: 0.85rem;
+                font-size: 0.8rem;
+                min-width: 600px;
+            }
+            .table thead th {
+                font-size: 0.7rem;
+                padding: 0.75rem 0.4rem;
+            }
+            .table td {
+                padding: 0.75rem 0.4rem;
+            }
+            .order-status {
+                font-size: 0.65rem;
+                padding: 3px 10px;
+            }
+            .btn-outline-primary-custom {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            :root {
+                --navbar-height: 60px;
+            }
+            body {
+                padding-top: var(--navbar-height);
+            }
+            .page-header h2 {
+                font-size: 1.2rem;
+            }
+            .page-header p {
+                font-size: 0.8rem;
+            }
+            .orders-card {
+                padding: 0.75rem;
+            }
+            .table {
+                font-size: 0.7rem;
+                min-width: 500px;
+            }
+            .table thead th {
+                font-size: 0.6rem;
+                padding: 0.5rem 0.3rem;
+                letter-spacing: 0.5px;
+            }
+            .table td {
+                padding: 0.5rem 0.3rem;
+            }
+            .order-status {
+                font-size: 0.55rem;
+                padding: 2px 8px;
+            }
+            .btn-outline-primary-custom {
+                font-size: 0.6rem;
+                padding: 0.15rem 0.6rem;
             }
         }
     </style>
@@ -285,109 +253,103 @@
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg fixed-top">
+<th:block th:replace="~{fragments/navbar :: navbar(activePage='orders')}" />
+
+<!-- Page Wrapper -->
+<div class="page-wrapper">
+    <!-- Page Header -->
     <div class="container">
-        <a class="navbar-brand" href="/">
-            <img src="/images/logo.jpg" alt="BOBBY RIDE CUSTOMS Logo">
-            <div class="brand-text">
-                <span class="brand-main">BOBBY RIDE</span>
-                <span class="brand-sub">CUSTOMS</span>
-            </div>
-        </a>
-
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <form class="d-flex mx-auto navbar-search" action="/search" method="get" role="search">
-                <input class="form-control" type="search" name="q" placeholder="Search accessories..." aria-label="Search">
-                <button class="btn btn-outline-light ms-2" type="submit"><i class="bi bi-search"></i></button>
-            </form>
-
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/products"><i class="bi bi-grid-3x3-gap"></i> Products</a></li>
-                <li class="nav-item"><a class="nav-link" href="/cart"><i class="bi bi-cart3"></i> Cart</a></li>
-                <li class="nav-item" sec:authorize="isAnonymous()">
-                    <a class="nav-link" href="/login"><i class="bi bi-person"></i> Login</a>
-                </li>
-                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle"></i>
-                        <span sec:authentication="principal.fullName"></span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="/profile"><i class="bi bi-person me-2"></i>Profile</a></li>
-                        <li><a class="dropdown-item" href="/orders"><i class="bi bi-receipt me-2"></i>My Orders</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
-                    </ul>
-                </li>
-            </ul>
+        <div class="page-header">
+            <h2><i class="bi bi-receipt"></i> My Orders</h2>
+            <p>Review your past orders and their current status</p>
         </div>
     </div>
-</nav>
 
-<!-- Page Header -->
-<div class="container">
-    <div class="page-header">
-        <h2><i class="bi bi-receipt"></i> My Orders</h2>
-        <p>Review your past orders and their current status</p>
-    </div>
-</div>
-
-<!-- Orders Section -->
-<div class="container pb-4">
-    <div class="orders-card">
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Order #</th>
-                    <th>Status</th>
-                    <th>Total</th>
-                    <th>Date</th>
-                    <th>Details</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="order : ${orders}">
-                    <td th:text="${order.orderNumber}">#12345</td>
-                    <td>
+    <!-- Orders Section -->
+    <div class="container pb-4">
+        <div class="orders-card">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Date</th>
+                        <th>Details</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td>
+                            <span class="fw-bold" th:text="${order.orderNumber}">#12345</span>
+                        </td>
+                        <td>
                             <span th:switch="${order.status}">
-                                <span th:case="'PENDING'" class="order-status status-pending" th:text="${order.status}">PENDING</span>
-                                <span th:case="'CONFIRMED'" class="order-status status-confirmed" th:text="${order.status}">CONFIRMED</span>
-                                <span th:case="'SHIPPED'" class="order-status status-shipped" th:text="${order.status}">SHIPPED</span>
-                                <span th:case="'CANCELLED'" class="order-status status-cancelled" th:text="${order.status}">CANCELLED</span>
+                                <span th:case="'PENDING'" class="order-status status-pending" th:text="'Pending'">PENDING</span>
+                                <span th:case="'CONFIRMED'" class="order-status status-confirmed" th:text="'Confirmed'">CONFIRMED</span>
+                                <span th:case="'SHIPPED'" class="order-status status-shipped" th:text="'Shipped'">SHIPPED</span>
+                                <span th:case="'DELIVERED'" class="order-status status-delivered" th:text="'Delivered'">DELIVERED</span>
+                                <span th:case="'CANCELLED'" class="order-status status-cancelled" th:text="'Cancelled'">CANCELLED</span>
                                 <span th:case="*" class="order-status" th:text="${order.status}">UNKNOWN</span>
                             </span>
-                    </td>
-                    <td>₹<span th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}">0.00</span></td>
-                    <td th:text="${#temporals.format(order.createdAt, 'dd-MM-yyyy')}">01-01-2026</td>
-                    <td>
-                        <a th:href="@{/orders/{id}(id=${order.id})}" class="btn-outline-primary-custom">View <i class="bi bi-arrow-right"></i></a>
-                    </td>
-                </tr>
-                <tr th:if="${#lists.isEmpty(orders)}">
-                    <td colspan="5" class="text-center text-muted py-4">
-                        <i class="bi bi-receipt" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
-                        You have no orders yet. <a href="/products" class="text-primary-light">Shop now</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                        </td>
+                        <td>
+                            <span class="fw-semibold" style="color: var(--primary-light);">
+                                ₹<span th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}">0.00</span>
+                            </span>
+                        </td>
+                        <td th:text="${#temporals.format(order.createdAt, 'dd-MM-yyyy')}">01-01-2026</td>
+                        <td>
+                            <a th:href="@{/orders/{id}(id=${order.id})}" class="btn-outline-primary-custom">
+                                View <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(orders)}">
+                        <td colspan="5" class="text-center py-5">
+                            <i class="bi bi-receipt" style="font-size: 3rem; display: block; margin-bottom: 1rem; color: var(--text-muted);"></i>
+                            <h5 class="text-light">No orders yet</h5>
+                            <p class="text-muted">Start shopping to see your orders here.</p>
+                            <a href="/products" class="btn btn-primary-custom mt-2" style="display: inline-block; padding: 0.6rem 2rem; background: var(--gradient-primary); border-radius: 50px; color: white; text-decoration: none; font-weight: 600;">
+                                <i class="bi bi-shop"></i> Browse Products
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Footer -->
-<footer class="footer">
-    <div class="container text-center">
-        <p class="mb-0">© 2026 BOBBY RIDE CUSTOMS. Premium Motorcycle Accessories.</p>
-    </div>
-</footer>
+<th:block th:replace="~{fragments/footer :: footer}" />
 
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // ===== NAVBAR SCROLL EFFECT =====
+    window.addEventListener('scroll', function() {
+        const navbar = document.getElementById('mainNav');
+        if (navbar) {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        }
+    });
+
+    // ===== ADD SCROLL CLASS ON LOAD =====
+    document.addEventListener('DOMContentLoaded', function() {
+        const navbar = document.getElementById('mainNav');
+        if (navbar && window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        }
+    });
+</script>
+
 </body>
 </html>

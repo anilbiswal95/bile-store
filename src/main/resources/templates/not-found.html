@@ -13,6 +13,11 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+  <!-- ===== IMPORT FRAGMENT STYLES ===== -->
+  <th:block th:replace="~{fragments/navbar :: navbar-styles}" />
+  <th:block th:replace="~{fragments/brand :: brand-styles}" />
+  <th:block th:replace="~{fragments/footer :: footer-styles}" />
+
   <style>
     :root {
         --primary: #e63946;
@@ -338,49 +343,7 @@
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
-  <div class="container">
-    <a class="navbar-brand" href="/">
-      <img src="/images/logo.jpg" alt="BOBBY RIDE CUSTOMS Logo">
-      <div class="brand-text">
-        <span class="brand-main">BOBBY RIDE</span>
-        <span class="brand-sub">CUSTOMS</span>
-      </div>
-    </a>
-
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <form class="d-flex mx-auto navbar-search" action="/search" method="get" role="search">
-        <input class="form-control" type="search" name="q" placeholder="Search accessories..." aria-label="Search">
-        <button class="btn btn-outline-light ms-2" type="submit"><i class="bi bi-search"></i></button>
-      </form>
-
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="/products"><i class="bi bi-grid-3x3-gap"></i> Products</a></li>
-        <li class="nav-item"><a class="nav-link" href="/cart"><i class="bi bi-cart3"></i> Cart</a></li>
-        <li class="nav-item" sec:authorize="isAnonymous()">
-          <a class="nav-link" href="/login"><i class="bi bi-person"></i> Login</a>
-        </li>
-        <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-             data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person-circle"></i>
-            <span sec:authentication="principal.fullName"></span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-            <li><a class="dropdown-item" href="/profile"><i class="bi bi-person me-2"></i>Profile</a></li>
-            <li><a class="dropdown-item" href="/orders"><i class="bi bi-receipt me-2"></i>My Orders</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
-          </ul>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
+<th:block th:replace="~{fragments/navbar :: navbar(activePage='home')}" />
 
 <!-- Not Found Content -->
 <section class="notfound-section">
@@ -403,11 +366,7 @@
 </section>
 
 <!-- Footer -->
-<footer class="footer">
-  <div class="container text-center">
-    <p class="mb-0">© 2026 BOBBY RIDE CUSTOMS. Premium Motorcycle Accessories.</p>
-  </div>
-</footer>
+<th:block th:replace="~{fragments/footer :: footer}" />
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

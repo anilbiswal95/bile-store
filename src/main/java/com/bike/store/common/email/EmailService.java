@@ -1,7 +1,7 @@
 package com.bike.store.common.email;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;  // CHANGED: Add this import
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j  // CHANGED: Added @Slf4j for logging
+@Slf4j
 public class EmailService {
 
     private final JavaMailSender mailSender;
@@ -26,7 +26,7 @@ public class EmailService {
             message.setTo(to);
             message.setSubject(subject);
             message.setText(text);
-            message.setFrom("noreply@bobbyridecustoms.com");  // CHANGED: Updated domain
+            message.setFrom("noreply@bobbyridecustoms.com");
 
             mailSender.send(message);
             log.info("Simple email sent to: {}", to);
@@ -38,18 +38,18 @@ public class EmailService {
     public void sendHtmlEmail(String to, String subject, String templateName, Map<String, Object> variables) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
+            // ===== CHANGED: Explicitly set UTF-8 encoding =====
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setFrom("noreply@bobbyridecustoms.com");  // CHANGED: Updated domain
+            helper.setFrom("noreply@bobbyridecustoms.com");
 
             Context context = new Context();
             if (variables != null) {
                 context.setVariables(variables);
             }
 
-            // CHANGED: Try different template paths
             String htmlContent;
             try {
                 // Try with "emails/" prefix first
@@ -61,12 +61,13 @@ public class EmailService {
                     htmlContent = templateEngine.process(templateName, context);
                 } catch (Exception e2) {
                     log.error("Template not found: {}", templateName);
-                    // Create fallback HTML content
                     htmlContent = createFallbackEmailContent(variables);
                 }
             }
 
+            // ===== CHANGED: Explicitly set text with UTF-8 =====
             helper.setText(htmlContent, true);
+
             mailSender.send(message);
             log.info("HTML email sent to: {}", to);
         } catch (Exception e) {
@@ -74,14 +75,13 @@ public class EmailService {
         }
     }
 
-    // CHANGED: Added fallback method when template is not found
     private String createFallbackEmailContent(Map<String, Object> variables) {
         StringBuilder html = new StringBuilder();
-        html.append("<html><body>");
+        html.append("<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body>");
         html.append("<h1>Order Confirmation - BOBBY RIDE CUSTOMS</h1>");
         html.append("<p>Dear ").append(variables.getOrDefault("customerName", "Customer")).append(",</p>");
         html.append("<p>Thank you for your order! Order #").append(variables.getOrDefault("orderNumber", "N/A")).append("</p>");
-        html.append("<p>Total Amount: ₹").append(variables.getOrDefault("totalAmount", "0.00")).append("</p>");
+        html.append("<p>Total Amount: &#8377;").append(variables.getOrDefault("totalAmount", "0.00")).append("</p>");
         html.append("<p>Shipping Address: ").append(variables.getOrDefault("shippingAddress", "N/A")).append("</p>");
         html.append("<p>Payment Method: ").append(variables.getOrDefault("paymentMethod", "COD")).append("</p>");
         html.append("<p>We'll send you a tracking number once your order ships.</p>");

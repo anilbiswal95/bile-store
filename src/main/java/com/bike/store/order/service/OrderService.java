@@ -20,6 +20,7 @@ import com.bike.store.user.entity.User;
 import com.bike.store.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +49,40 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final EmailService emailService;
 
+    // ===== INJECT PROPERTIES FROM application.properties =====
+    @Value("${company.name}")
+    private String companyName;
+
+    @Value("${company.sub:Premium Motorcycle Accessories}")
+    private String companySub;
+
+    @Value("${company.year}")
+    private String companyYear;
+
+    @Value("${company.email}")
+    private String companyEmail;
+
+    @Value("${gst.gstin}")
+    private String gstin;
+
+    @Value("${gst.rate}")
+    private String gstRate;
+
+    @Value("${gst.hsn}")
+    private String hsnCode;
+
+    @Value("${gst.description}")
+    private String gstDescription;
+
+    @Value("${app.default.currency}")
+    private String defaultCurrency;
+
+    @Value("${app.base.url}")
+    private String appBaseUrl;
+
+    /**
+     * Place a new order from user's cart
+     */
     @Transactional
     public OrderDto placeOrder(String email, PlaceOrderRequest request) {
         User user = userRepository.findByEmail(email)
@@ -60,6 +95,7 @@ public class OrderService {
             throw new AppException("Cart is empty", HttpStatus.BAD_REQUEST);
         }
 
+        // Create order
         Order order = Order.builder()
                 .orderNumber("ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
                 .user(user)
@@ -71,15 +107,20 @@ public class OrderService {
 
         BigDecimal total = BigDecimal.ZERO;
 
+        // Process each cart item
         for (CartItem cartItem : cart.getItems()) {
             Product product = cartItem.getProduct();
+
+            // Check stock
             if (product.getStock() < cartItem.getQuantity()) {
                 throw new AppException("Insufficient stock for: " + product.getName(), HttpStatus.BAD_REQUEST);
             }
 
+            // Update stock
             product.setStock(product.getStock() - cartItem.getQuantity());
             productRepository.save(product);
 
+            // Create order item
             OrderItem orderItem = OrderItem.builder()
                     .order(order)
                     .product(product)
@@ -90,11 +131,14 @@ public class OrderService {
 
             order.getItems().add(orderItem);
 
+            // Calculate total
             total = total.add(product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
         }
 
         order.setTotalAmount(total);
         orderRepository.save(order);
+
+        // Clear the cart
         cartService.clearCart(email);
 
         // Send order confirmation email
@@ -103,6 +147,9 @@ public class OrderService {
         return toDto(order);
     }
 
+    /**
+     * Get all orders for a user with pagination
+     */
     public List<OrderDto> getUserOrders(String email, int page, int size) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -113,12 +160,33 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get a single order by ID
+     */
     public OrderDto getOrder(Long id) {
         Order order = orderRepository.findByIdWithItems(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         return toDto(order);
     }
 
+    /**
+     * Get an order for a specific user (with authorization check)
+     */
+    public OrderDto getOrderForUser(Long id, String userEmail) {
+        Order order = orderRepository.findByIdWithItems(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        // Ensure the order belongs to the requesting user
+        if (order.getUser() == null || !order.getUser().getEmail().equalsIgnoreCase(userEmail)) {
+            throw new ResourceNotFoundException("Order not found");
+        }
+
+        return toDto(order);
+    }
+
+    /**
+     * Update order status (Admin only)
+     */
     @Transactional
     public OrderDto updateStatus(Long id, OrderStatus status) {
         Order order = orderRepository.findById(id)
@@ -127,20 +195,55 @@ public class OrderService {
         return toDto(orderRepository.save(order));
     }
 
+    /**
+     * Get all orders for admin with pagination
+     */
+    @Transactional(readOnly = true)
     public Page<Order> getAllOrders(int page, int size) {
         return orderRepository.findAll(PageRequest.of(page, size));
     }
 
     /**
-     * Send order confirmation email to user
+     * Get all orders for admin with user data loaded eagerly
      */
+    @Transactional(readOnly = true)
+    public List<OrderResponseDto> getAllOrdersForAdmin(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        // Use custom query with JOIN FETCH to load user data eagerly
+        Page<Order> ordersPage = orderRepository.findAllWithUserAndItems(pageable);
+
+        return ordersPage.getContent().stream()
+                .map(this::convertToAdminOrderDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Send order confirmation email by order ID
+     */
+    @Transactional(readOnly = true)
+    public void sendOrderConfirmationEmailById(Long orderId, String email) {
+        Order order = orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        // Verify email matches order
+        if (order.getUser() == null || !order.getUser().getEmail().equalsIgnoreCase(email)) {
+            throw new AppException("Email does not match order", HttpStatus.BAD_REQUEST);
+        }
+
+        // Send email
+        sendOrderConfirmationEmail(order, order.getUser());
+        log.info("Order confirmation email sent successfully to: {}", email);
+    }
+
     /**
      * Send order confirmation email to user with GST invoice
-     * CHANGED: Added better error handling and template path fix
      */
     private void sendOrderConfirmationEmail(Order order, User user) {
         try {
             Map<String, Object> variables = new HashMap<>();
+
+            // ===== ORDER DETAILS =====
             variables.put("customerName", user.getFullName());
             variables.put("orderNumber", order.getOrderNumber());
             variables.put("orderDate", order.getCreatedAt());
@@ -148,7 +251,23 @@ public class OrderService {
             variables.put("paymentMethod", order.getPaymentMethod());
             variables.put("totalAmount", order.getTotalAmount());
 
-            // Convert items to simple DTOs or maps
+            // ===== GST DETAILS (from application.properties) =====
+            variables.put("gstRate", Double.parseDouble(gstRate));
+            variables.put("gstin", gstin);
+            variables.put("hsnCode", hsnCode);
+            variables.put("gstDescription", gstDescription);
+
+            // ===== COMPANY DETAILS (from application.properties) =====
+            variables.put("companyName", companyName);
+            variables.put("companySub", companySub);
+            variables.put("companyYear", companyYear);
+            variables.put("supportEmail", companyEmail);
+
+            // ===== APP DETAILS (from application.properties) =====
+            variables.put("defaultCurrency", defaultCurrency);
+            variables.put("appBaseUrl", appBaseUrl);
+
+            // ===== ORDER ITEMS =====
             List<Map<String, Object>> items = order.getItems().stream().map(it -> {
                 Map<String, Object> m = new HashMap<>();
                 m.put("productName", it.getProductName());
@@ -159,21 +278,27 @@ public class OrderService {
             }).collect(Collectors.toList());
             variables.put("items", items);
 
-            // CHANGED: Use correct template name without "emails/" prefix if not configured
+            // Log the variables for debugging
+            log.debug("Sending order confirmation email with variables: {}", variables.keySet());
+
+            // ===== SEND EMAIL =====
             emailService.sendHtmlEmail(
                     user.getEmail(),
                     "Order Confirmation - " + order.getOrderNumber(),
-                    "order-confirmation",  // Template name: order-confirmation.html
+                    "order-confirmation",  // Template file: order-confirmation.html
                     variables
             );
+
             log.info("Order confirmation email sent to: {}", user.getEmail());
+
         } catch (Exception e) {
-            // CHANGED: Log error with more details
             log.error("Failed to send order confirmation email to {}: {}", user.getEmail(), e.getMessage(), e);
         }
     }
 
-
+    /**
+     * Convert Order entity to OrderDto
+     */
     private OrderDto toDto(Order order) {
         OrderDto dto = new OrderDto();
         dto.setId(order.getId());
@@ -199,56 +324,7 @@ public class OrderService {
     }
 
     /**
-     * Return an order for a given id only if it belongs to the user with the given email.
-     * Throws ResourceNotFoundException if order not found or does not belong to the user.
-     */
-    public OrderDto getOrderForUser(Long id, String userEmail) {
-        Order order = orderRepository.findByIdWithItems(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-
-        // Ensure the order belongs to the requesting user
-        if (order.getUser() == null || !order.getUser().getEmail().equalsIgnoreCase(userEmail)) {
-            throw new ResourceNotFoundException("Order not found");
-        }
-
-        return toDto(order);
-    }
-    /*public List<OrderResponseDto> getAllOrdersForAdmin(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return orderRepository.findAll(PageRequest.of(page, size))
-                .getContent()
-                .stream()
-                .map(order -> {
-                    OrderResponseDto dto = new OrderResponseDto();
-                    dto.setId(order.getId());
-                    dto.setOrderNumber(order.getOrderNumber());
-                    dto.setUserEmail(order.getUser().getEmail());
-                    dto.setStatus(order.getStatus().name());
-                    dto.setTotalAmount(order.getTotalAmount());
-                    dto.setCreatedAt(order.getCreatedAt());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }*/
-    /**
-     * CHANGED: Updated to use OrderResponseDto with eager loading
-     * Uses JOIN FETCH to load User data in the same query
-     */
-    @Transactional(readOnly = true)
-    public List<OrderResponseDto> getAllOrdersForAdmin(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-
-        // CHANGED: Use custom query with JOIN FETCH to load user data eagerly
-        Page<Order> ordersPage = orderRepository.findAllWithUserAndItems(pageable);
-
-        return ordersPage.getContent().stream()
-                .map(this::convertToAdminOrderDto)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * CHANGED: New method to convert Order to OrderResponseDto
-     * Handles the User data safely since it's loaded eagerly
+     * Convert Order to OrderResponseDto for Admin
      */
     private OrderResponseDto convertToAdminOrderDto(Order order) {
         OrderResponseDto dto = new OrderResponseDto();
@@ -261,7 +337,7 @@ public class OrderService {
         dto.setCreatedAt(order.getCreatedAt());
         dto.setUpdatedAt(order.getUpdatedAt());
 
-        // CHANGED: Safe access to user since it's loaded via JOIN FETCH
+        // Safe access to user since it's loaded via JOIN FETCH
         User user = order.getUser();
         if (user != null) {
             dto.setUserEmail(user.getEmail());
@@ -272,23 +348,5 @@ public class OrderService {
         }
 
         return dto;
-    }
-    /**
-     * Send order confirmation email by order ID
-     * CHANGED: Added this method to send email separately
-     */
-    @Transactional(readOnly = true)
-    public void sendOrderConfirmationEmailById(Long orderId, String email) {
-        Order order = orderRepository.findByIdWithItems(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-
-        // Verify email matches order
-        if (order.getUser() == null || !order.getUser().getEmail().equalsIgnoreCase(email)) {
-            throw new AppException("Email does not match order", HttpStatus.BAD_REQUEST);
-        }
-
-        // Send email
-        sendOrderConfirmationEmail(order, order.getUser());
-        log.info("Order confirmation email sent successfully to: {}", email);
     }
 }

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<!-- ===== BRAND FRAGMENT ===== -->
+<!-- Usage:
+     Simple version: <th:block th:replace="~{fragments/brand :: brand-simple}" />
+     Full version:   <th:block th:replace="~{fragments/brand :: brand-full}" />
+-->
+
+<!-- SIMPLE BRAND (for products.html, product-detail.html) -->
+<th:block th:fragment="brand-simple">
+    <div class="brand-text">
+        <span class="brand-main">BOBBY RIDE</span>
+        <span class="brand-sub">CUSTOMS</span>
+    </div>
+</th:block>
+
+<!-- FULL BRAND with styling (for home.html) -->
+<th:block th:fragment="brand-full">
+    <div class="brand-text">
+        <span class="brand-bobby">BOBBY</span>
+        <span class="brand-ride-customs">RIDE CUSTOMS</span>
+        <span class="brand-pune">PUNE</span>
+    </div>
+</th:block>
+
+<!-- ===== CSS VARIABLES (Add to your existing CSS) ===== -->
+<th:block th:fragment="brand-styles">
+    <style>
+        /* === BRAND CSS - Place this in your existing style blocks === */
+
+        /* Simple Brand Styles (products.html, product-detail.html) */
+        .navbar-brand .brand-main {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #e63946 0%, #c62835 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-brand .brand-sub {
+            font-size: 0.55rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: #b0b0b0;
+            -webkit-text-fill-color: #b0b0b0;
+        }
+
+        /* Full Brand Styles (home.html) */
+        .navbar-brand .brand-bobby {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #FF7F32, #FFB347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: -2px;
+        }
+
+        .navbar-brand .brand-ride-customs {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #000000;
+            text-shadow: -1px -1px 0 #FF6B00, 1px -1px 0 #FF6B00,
+                         -1px 1px 0 #FF6B00, 1px 1px 0 #FF6B00,
+                         0 0 10px rgba(255, 107, 0, 0.3);
+            line-height: 1.2;
+        }
+
+        .navbar-brand .brand-pune {
+            font-family: 'Orbitron', monospace;
+            font-weight: 500;
+            font-size: 0.5rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #000000;
+            text-shadow: -1px -1px 0 #FF6B00, 1px -1px 0 #FF6B00,
+                         -1px 1px 0 #FF6B00, 1px 1px 0 #FF6B00;
+            margin-top: 2px;
+            opacity: 0.9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar-brand .brand-bobby {
+                font-size: 1.1rem;
+            }
+            .navbar-brand .brand-ride-customs {
+                font-size: 0.75rem;
+                letter-spacing: 2px;
+            }
+            .navbar-brand .brand-pune {
+                font-size: 0.45rem;
+                letter-spacing: 3px;
+            }
+        }
+        @media (max-width: 576px) {
+            .navbar-brand .brand-bobby {
+                font-size: 0.95rem;
+            }
+            .navbar-brand .brand-ride-customs {
+                font-size: 0.65rem;
+                letter-spacing: 1.5px;
+            }
+            .navbar-brand .brand-pune {
+                font-size: 0.4rem;
+                letter-spacing: 2px;
+            }
+        }
+    </style>
+</th:block>
+
+</body>
+</html>

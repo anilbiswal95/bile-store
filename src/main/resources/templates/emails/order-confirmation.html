@@ -2,10 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Order Confirmation - BOBBY RIDE CUSTOMS</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title th:text="'Order Confirmation - ' + ${companyName}">Order Confirmation - BOBBY RIDE CUSTOMS</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
             background: #f5f5f5;
             margin: 0;
             padding: 20px;
@@ -34,6 +35,11 @@
         .header .brand {
             color: #e63946;
             font-weight: 700;
+        }
+        .header .sub {
+            color: #b0b0b0;
+            margin: 5px 0 0;
+            font-size: 14px;
         }
         .content {
             padding: 30px;
@@ -64,16 +70,9 @@
             padding: 5px 0;
             border-bottom: 1px solid #eee;
         }
-        .order-box .order-detail:last-child {
-            border-bottom: none;
-        }
-        .order-box .label {
-            color: #666;
-        }
-        .order-box .value {
-            font-weight: 600;
-            color: #333;
-        }
+        .order-box .order-detail:last-child { border-bottom: none; }
+        .order-box .label { color: #666; }
+        .order-box .value { font-weight: 600; color: #333; }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -94,21 +93,7 @@
             border-bottom: 1px solid #eee;
             color: #333;
         }
-        table tbody tr:hover {
-            background: #f8f9fa;
-        }
-        .total-row {
-            background: #f8f9fa;
-            font-weight: 700;
-        }
-        .total-row td {
-            padding: 15px;
-            border-top: 2px solid #e63946;
-        }
-        .total-amount {
-            color: #e63946;
-            font-size: 20px;
-        }
+        table tbody tr:hover { background: #f8f9fa; }
         .gst-section {
             background: #f0f4f8;
             padding: 15px 20px;
@@ -124,16 +109,37 @@
         .gst-section .gst-row {
             display: flex;
             justify-content: space-between;
-            padding: 3px 0;
+            padding: 5px 0;
             font-size: 14px;
             color: #555;
         }
+        .gst-section .gst-row .label {
+            color: #666;
+        }
+        .gst-section .gst-row .amount {
+            font-weight: 600;
+            color: #333;
+        }
         .gst-section .gst-total {
-            border-top: 2px solid #333;
+            border-top: 2px solid #e63946;
             padding-top: 10px;
             margin-top: 8px;
             font-weight: 700;
             color: #333;
+        }
+        .gst-section .gst-total .amount {
+            color: #e63946;
+            font-size: 18px;
+        }
+        .gst-section .gst-footer {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #888;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        .gst-section .gst-footer div {
+            margin: 2px 0;
         }
         .info-section {
             display: grid;
@@ -170,9 +176,7 @@
             color: #e63946;
             text-decoration: none;
         }
-        .footer a:hover {
-            text-decoration: underline;
-        }
+        .footer a:hover { text-decoration: underline; }
         .btn {
             display: inline-block;
             padding: 12px 30px;
@@ -184,8 +188,14 @@
             margin-top: 20px;
             transition: background 0.3s;
         }
-        .btn:hover {
-            background: #c62835;
+        .btn:hover { background: #c62835; }
+        .text-muted { color: #888; }
+        .text-brand { color: #e63946; }
+        .text-right { text-align: right; }
+        .fw-bold { font-weight: 700; }
+        .currency {
+            font-family: 'Arial', sans-serif;
+            font-weight: 600;
         }
         @media (max-width: 600px) {
             .container { margin: 10px; }
@@ -193,6 +203,7 @@
             table { font-size: 13px; }
             table thead th, table tbody td { padding: 8px 10px; }
             .order-box .order-detail { flex-direction: column; }
+            .order-box .order-detail .value { margin-top: 2px; }
         }
     </style>
 </head>
@@ -200,8 +211,8 @@
 <div class="container">
     <!-- Header -->
     <div class="header">
-        <h1>🎉 <span class="brand">BOBBY RIDE</span> CUSTOMS</h1>
-        <p style="color: #b0b0b0; margin: 5px 0 0; font-size: 14px;">Premium Motorcycle Accessories</p>
+        <h1>🎉 <span class="brand" th:text="${companyName}">BOBBY RIDE CUSTOMS</span></h1>
+        <p class="sub" th:text="${companySub}">Premium Motorcycle Accessories</p>
     </div>
 
     <!-- Content -->
@@ -240,8 +251,18 @@
             <tr th:each="item : ${items}">
                 <td th:text="${item.productName}">Product Name</td>
                 <td style="text-align:center;" th:text="${item.quantity}">1</td>
-                <td style="text-align:right;">₹<span th:text="${#numbers.formatDecimal(item.price, 1, 2)}">0.00</span></td>
-                <td style="text-align:right;">₹<span th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)}">0.00</span></td>
+                <td style="text-align:right;">
+                    <!-- ===== CHANGED: Use HTML entity for Rupee ===== -->
+                    <span class="currency">&#8377;</span>
+                    <span th:text="${#numbers.formatDecimal(item.price, 1, 2)}">0.00</span>
+                </td>
+                <td style="text-align:right;">
+                    <span class="currency">&#8377;</span>
+                    <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)}">0.00</span>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(items)}">
+                <td colspan="4" style="text-align:center; color:#888; padding: 15px;">No items found</td>
             </tr>
             </tbody>
         </table>
@@ -249,21 +270,47 @@
         <!-- GST Invoice Section -->
         <div class="gst-section">
             <div class="gst-title">📄 GST Invoice</div>
+
+            <!-- Subtotal -->
             <div class="gst-row">
-                <span>Subtotal</span>
-                <span>₹<span th:text="${#numbers.formatDecimal(totalAmount, 1, 2)}">0.00</span></span>
+                <span class="label">Subtotal</span>
+                <span class="amount">
+                    <span class="currency">&#8377;</span>
+                    <span th:text="${#numbers.formatDecimal(totalAmount, 1, 2)}">0.00</span>
+                </span>
             </div>
-            <div class="gst-row">
-                <span>GST (18%)</span>
-                <span>₹<span th:text="${#numbers.formatDecimal(totalAmount * 0.18, 1, 2)}">0.00</span></span>
+
+            <!-- GST Amount -->
+            <div class="gst-row" th:if="${gstRate != null and gstRate > 0}">
+                <span class="label">GST (<span th:text="${gstRate}">18</span>%)</span>
+                <span class="amount">
+                    <span class="currency">&#8377;</span>
+                    <span th:text="${#numbers.formatDecimal(totalAmount * gstRate / 100, 1, 2)}">0.00</span>
+                </span>
             </div>
-            <div class="gst-row gst-total">
-                <span>Total (incl. GST)</span>
-                <span style="font-size:18px; color:#e63946;">₹<span th:text="${#numbers.formatDecimal(totalAmount * 1.18, 1, 2)}">0.00</span></span>
+
+            <!-- Total with GST -->
+            <div class="gst-row gst-total" th:if="${gstRate != null and gstRate > 0}">
+                <span class="label">Total (incl. GST)</span>
+                <span class="amount">
+                    <span class="currency">&#8377;</span>
+                    <span th:text="${#numbers.formatDecimal(totalAmount * (1 + gstRate / 100), 1, 2)}">0.00</span>
+                </span>
             </div>
-            <div style="margin-top:10px; font-size:12px; color:#888; border-top:1px solid #ddd; padding-top:10px;">
-                <div>GSTIN: 22AAAAA0000A1Z5</div>
-                <div>HSN/SAC: 8714 (Motorcycle parts & accessories)</div>
+
+            <!-- Total without GST (fallback) -->
+            <div class="gst-row gst-total" th:if="${gstRate == null or gstRate == 0}">
+                <span class="label">Total</span>
+                <span class="amount">
+                    <span class="currency">&#8377;</span>
+                    <span th:text="${#numbers.formatDecimal(totalAmount, 1, 2)}">0.00</span>
+                </span>
+            </div>
+
+            <!-- GST Footer -->
+            <div class="gst-footer">
+                <div>GSTIN: <strong th:text="${gstin}">27AJWPB1217D1ZI</strong></div>
+                <div>HSN/SAC: <strong th:text="${hsnCode}">8714</strong> (<span th:text="${gstDescription}">Motorcycle parts & accessories</span>)</div>
             </div>
         </div>
 
@@ -284,15 +331,17 @@
         </p>
 
         <div style="text-align:center;">
-            <a href="http://localhost:8080/orders" class="btn">View My Orders</a>
+            <a th:href="${appBaseUrl} + '/orders'" class="btn">View My Orders</a>
         </div>
     </div>
 
     <!-- Footer -->
     <div class="footer">
-        <p style="margin: 0;">© 2026 BOBBY RIDE CUSTOMS. All rights reserved.</p>
+        <p style="margin: 0;">
+            © <span th:text="${companyYear}">2026</span> <span th:text="${companyName}">BOBBY RIDE CUSTOMS</span>. All rights reserved.
+        </p>
         <p style="margin: 5px 0 0;">
-            <a href="mailto:support@bobbyridecustoms.com">support@bobbyridecustoms.com</a>
+            <a th:href="'mailto:' + ${supportEmail}" th:text="${supportEmail}">support@bobbyridecustoms.com</a>
         </p>
         <p style="margin: 5px 0 0; font-size: 11px; color: #aaa;">
             This is a system-generated email. Please do not reply.
