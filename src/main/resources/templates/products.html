@@ -266,12 +266,12 @@
             color: white;
         }
 
-        /* ===== PRODUCT CARDS ===== */
+        /* ===== PRODUCT CARDS WITH IMAGES ===== */
         .product-card {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.06);
             border-radius: var(--border-radius);
-            padding: 1.5rem;
+            padding: 1rem;
             transition: var(--transition);
             height: 100%;
             cursor: pointer;
@@ -305,16 +305,39 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
-        .product-card .product-icon {
-            font-size: 2.5rem;
-            color: rgba(255,255,255,0.1);
-            text-align: center;
-            display: block;
+        /* Product Image Container */
+        .product-card .product-image {
+            width: 100%;
+            height: 180px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-bottom: 0.8rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-card .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
             transition: var(--transition);
         }
 
-        .product-card:hover .product-icon {
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-card .product-image .product-icon {
+            font-size: 2.5rem;
+            color: rgba(255,255,255,0.1);
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image .product-icon {
             color: rgba(230, 57, 70, 0.3);
             transform: scale(1.1) rotate(-5deg);
         }
@@ -349,12 +372,12 @@
             transition: var(--transition);
             text-decoration: none;
             display: inline-block;
-            pointer-events: auto;
+            pointer-events: none;
             position: relative;
             z-index: 2;
         }
 
-        .product-card .btn-detail:hover {
+        .product-card:hover .btn-detail {
             background: var(--gradient-primary);
             border-color: var(--primary);
             color: white;
@@ -415,6 +438,15 @@
             }
             .products-header h3 {
                 font-size: 1.5rem;
+            }
+            .product-card .product-image {
+                height: 140px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .product-card .product-image {
+                height: 120px;
             }
         }
     </style>
@@ -517,10 +549,16 @@
         <!-- Product Grid -->
         <div class="col-md-9">
             <div class="row g-4">
-                <!-- CHANGED: Wrapped each product card in an <a> tag for proper navigation -->
                 <div th:each="product : ${products.content}" class="col-md-4">
                     <a th:href="@{/products/{id}(id=${product.id})}" class="product-card">
-                        <i class="bi bi-box-seam product-icon"></i>
+                        <!-- CHANGED: Added product image -->
+                        <div class="product-image">
+                            <img th:if="${product.imageUrl != null and product.imageUrl != ''}"
+                                 th:src="${product.imageUrl}"
+                                 th:alt="${product.name}">
+                            <i th:unless="${product.imageUrl != null and product.imageUrl != ''}"
+                               class="bi bi-box-seam product-icon"></i>
+                        </div>
                         <h6 class="product-title" th:text="${product.name}">Product</h6>
                         <small class="product-model" th:text="${product.bikeModel}">Model</small>
                         <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-light border-opacity-10">

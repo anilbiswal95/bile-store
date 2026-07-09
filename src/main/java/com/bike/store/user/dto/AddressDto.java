@@ -21,4 +21,7 @@ public class AddressDto {
 
     @NotBlank
     private String pinCode;
+
+    // CHANGED: Added country field
+    private String country = "India";
 }

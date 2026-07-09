@@ -77,6 +77,8 @@ public class UserService {
                 .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
     }
 
+    // ===== ADDRESS METHODS =====
+
     public List<AddressDto> getAddresses(String email) {
         User user = getCurrentUser(email);
         return addressRepository.findByUserId(user.getId()).stream()
@@ -88,6 +90,12 @@ public class UserService {
     public AddressDto addAddress(String email, AddressDto dto) {
         User user = getCurrentUser(email);
 
+        // Check if user already has 4 addresses
+        long addressCount = addressRepository.findByUserId(user.getId()).size();
+        if (addressCount >= 4) {
+            throw new AppException("Maximum 4 addresses allowed. Please delete an existing address first.", HttpStatus.BAD_REQUEST);
+        }
+
         Address address = Address.builder()
                 .user(user)
                 .street(dto.getStreet())
@@ -95,10 +103,82 @@ public class UserService {
                 .state(dto.getState())
                 .pinCode(dto.getPinCode())
                 .isDefault(dto.isDefault())
+                .country(dto.getCountry() != null ? dto.getCountry() : "India")
                 .build();
+
+        // If this address is set as default, unset others
+        if (dto.isDefault()) {
+            List<Address> userAddresses = addressRepository.findByUserId(user.getId());
+            userAddresses.forEach(addr -> addr.setDefault(false));
+        } else if (addressRepository.findByUserId(user.getId()).isEmpty()) {
+            // If it's the first address, make it default
+            address.setDefault(true);
+        }
 
         return toAddressDto(addressRepository.save(address));
     }
+
+    // CHANGED: Added update address method
+    @Transactional
+    public AddressDto updateAddress(String email, Long addressId, AddressDto dto) {
+        User user = getCurrentUser(email);
+
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new AppException("Address not found", HttpStatus.NOT_FOUND));
+
+        // Verify address belongs to the user
+        if (!address.getUser().getId().equals(user.getId())) {
+            throw new AppException("Address not found for this user", HttpStatus.NOT_FOUND);
+        }
+
+        address.setStreet(dto.getStreet());
+        address.setCity(dto.getCity());
+        address.setState(dto.getState());
+        address.setPinCode(dto.getPinCode());
+        address.setCountry(dto.getCountry() != null ? dto.getCountry() : "India");
+        address.setDefault(dto.isDefault());
+
+        // If this address is set as default, unset others
+        if (dto.isDefault()) {
+            List<Address> userAddresses = addressRepository.findByUserId(user.getId());
+            userAddresses.forEach(addr -> {
+                if (!addr.getId().equals(addressId)) {
+                    addr.setDefault(false);
+                }
+            });
+        }
+
+        return toAddressDto(addressRepository.save(address));
+    }
+
+    // CHANGED: Added delete address method
+    @Transactional
+    public void deleteAddress(String email, Long addressId) {
+        User user = getCurrentUser(email);
+
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new AppException("Address not found", HttpStatus.NOT_FOUND));
+
+        // Verify address belongs to the user
+        if (!address.getUser().getId().equals(user.getId())) {
+            throw new AppException("Address not found for this user", HttpStatus.NOT_FOUND);
+        }
+
+        addressRepository.delete(address);
+    }
+
+    // ===== USER UPDATE =====
+
+    @Transactional
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
+
+    public Optional<User> getByEmail(String username) {
+        return userRepository.findByEmail(username);
+    }
+
+    // ===== PRIVATE HELPERS =====
 
     private AddressDto toAddressDto(Address a) {
         AddressDto dto = new AddressDto();
@@ -108,10 +188,7 @@ public class UserService {
         dto.setState(a.getState());
         dto.setPinCode(a.getPinCode());
         dto.setDefault(a.isDefault());
+        dto.setCountry(a.getCountry() != null ? a.getCountry() : "India");
         return dto;
-    }
-
-    public Optional<User> getByEmail(String username) {
-        return userRepository.findByEmail(username);
     }
 }

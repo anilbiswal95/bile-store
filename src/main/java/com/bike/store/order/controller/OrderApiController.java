@@ -2,6 +2,7 @@ package com.bike.store.order.controller;
 
 import com.bike.store.order.dto.OrderDto;
 import com.bike.store.order.dto.PlaceOrderRequest;
+import com.bike.store.order.dto.SendConfirmationRequest;
 import com.bike.store.order.service.OrderService;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,5 +35,12 @@ public class OrderApiController {
     @GetMapping("/{id}")
     public ResponseEntity<OrderDto> getOrder(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.getOrder(id));
+    }
+
+    // ===== CHANGED: Added endpoint to send confirmation email =====
+    @PostMapping("/send-confirmation")
+    public ResponseEntity<?> sendConfirmationEmail(@Valid @RequestBody SendConfirmationRequest request) {
+        orderService.sendOrderConfirmationEmailById(request.getOrderId(), request.getEmail());
+        return ResponseEntity.ok().build();
     }
 }

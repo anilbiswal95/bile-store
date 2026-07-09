@@ -545,21 +545,9 @@
         }
     }
 
+    // CHANGED: Removed address popup and redirect to checkout page
     function checkout() {
-        const address = prompt('Enter shipping address:');
-        if (!address) return;
-
-        fetch('/api/orders', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ shippingAddress: address, paymentMethod: 'COD' })
-        })
-        .then(r => r.json())
-        .then(order => {
-            alert('Order placed! Order #' + order.orderNumber);
-            window.location.href = '/orders';
-        })
-        .catch(() => alert('Failed to place order. Try again.'));
+        window.location.href = '/checkout';
     }
 
     loadCart();

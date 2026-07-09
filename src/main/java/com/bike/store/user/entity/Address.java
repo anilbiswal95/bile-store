@@ -31,4 +31,8 @@ public class Address extends BaseEntity {
 
     @Column(name = "is_default")
     private boolean isDefault;
+
+    // CHANGED: Added country field
+    @Column(name = "country")
+    private String country = "India";
 }
