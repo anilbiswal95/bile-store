@@ -186,4 +186,11 @@ public class WebController {
         }
     }
 
+    @GetMapping("/checkout")
+    public String checkoutPage(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        return "checkout";
+    }
 }

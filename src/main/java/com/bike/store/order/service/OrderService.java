@@ -273,5 +273,22 @@ public class OrderService {
 
         return dto;
     }
+    /**
+     * Send order confirmation email by order ID
+     * CHANGED: Added this method to send email separately
+     */
+    @Transactional(readOnly = true)
+    public void sendOrderConfirmationEmailById(Long orderId, String email) {
+        Order order = orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
+        // Verify email matches order
+        if (order.getUser() == null || !order.getUser().getEmail().equalsIgnoreCase(email)) {
+            throw new AppException("Email does not match order", HttpStatus.BAD_REQUEST);
+        }
+
+        // Send email
+        sendOrderConfirmationEmail(order, order.getUser());
+        log.info("Order confirmation email sent successfully to: {}", email);
+    }
 }

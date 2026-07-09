@@ -6,7 +6,7 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication(exclude = {
         org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration.class,
-        org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration.class
+        org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration.class,
 })
 @EnableCaching
 public class BikeStoreApplication {
